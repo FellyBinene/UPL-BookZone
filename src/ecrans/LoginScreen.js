@@ -4,7 +4,7 @@ import React from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const LoginScreen = () => {
+const LoginScreen = ({navigation}) => {
     return (
         <SafeAreaView style={styles.root}>
 
@@ -22,7 +22,7 @@ const LoginScreen = () => {
                     name="security"
                     size={20} color="#666"
                     style={{marginRight: 5}}/>
-                <TextInput style={styles.input} secureTextEntry/>
+                <TextInput style={styles.input} placeholder={"Entrer votre mots de passe"} secureTextEntry/>
 
                 <TouchableOpacity>
                     <Text style={{color: '#0065ff'}}>Oublié ?</Text>
@@ -31,16 +31,19 @@ const LoginScreen = () => {
 
             {/* Button Action */}
 
-            <TouchableOpacity style={styles.touchableButton}>
+            <TouchableOpacity style={styles.touchableButton1}>
                 <Text style={styles.touchableText}>Se connecter</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.textCenter}>
-                <Text>S'inscrire</Text>
+            <TouchableOpacity
+                style={styles.touchableButton2}
+                onPress={() => navigation.navigate('Inscription')}
+            >
+                <Text style={styles.textCenter}>S'inscrire</Text>
             </TouchableOpacity>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 export default LoginScreen;
 
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     input : {
         flex: 1,
     },
-    touchableButton:{
+    touchableButton1:{
         marginBottom : 30,
         borderRadius : 20,
         padding : 20,
@@ -80,6 +83,12 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize : 16,
         color: '#fff',
+    },
+    touchableButton2:{
+        marginBottom : 30,
+        borderRadius : 20,
+        padding : 20,
+        backgroundColor: '#fffb00',
     },
     textCenter:{
         textAlign: 'center',
