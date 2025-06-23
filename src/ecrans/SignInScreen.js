@@ -19,6 +19,7 @@ const SignInScreen = ({ navigation }) => {
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [matricule, setMatricule] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -46,7 +47,7 @@ const SignInScreen = ({ navigation }) => {
     };
 
     const handleSignUp = async () => {
-        if (email && fullName && phone && password && confirmPassword) {
+        if (email && fullName && phone && matricule && password && confirmPassword) {
             if (password !== confirmPassword) {
                 Alert.alert('Erreur', 'Les mots de passe ne correspondent pas');
                 return;
@@ -58,6 +59,7 @@ const SignInScreen = ({ navigation }) => {
                     fullName,
                     birthDate: birthDate.toISOString().split('T')[0],
                     phone,
+                    matricule,
                     password,
                 });
 
@@ -123,6 +125,17 @@ const SignInScreen = ({ navigation }) => {
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
+                />
+            </View>
+
+            <View style={styles.inputContainer}>
+                <Entypo name="phone" size={20} color="#666" style={{ marginRight: 5 }} />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Entrer votre matricule"
+                    keyboardType="phone-pad"
+                    value={matricule}
+                    onChangeText={setMatricule}
                 />
             </View>
 

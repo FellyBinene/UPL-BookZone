@@ -1,14 +1,18 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const usersRoutes = require('./routes/users');
+const app = express();
+const port = 3000;
 
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
+// Routes
 app.use('/api/users', usersRoutes);
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
+// Lancement du serveur
+app.listen(port, () => {
+    console.log(`Serveur démarré sur http://localhost:${port}`);
 });
