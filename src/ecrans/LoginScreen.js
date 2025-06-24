@@ -1,37 +1,91 @@
-import {View, Text, Image, StyleSheet, TextInput, TouchableOpacity} from 'react-native';
-import {SafeAreaView} from "react-native-safe-area-context";
-import React from 'react';
+import {
+    View,
+    Text,
+    Image,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    Alert
+} from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import axios from 'axios';
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ navigation }) => {
+    const [matricule, setMatricule] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSignIn = async () => {
+        if (!matricule.trim() || !password.trim()) {
+            Alert.alert('Champs manquants', 'Veuillez entrer votre matricule et mot de passe');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://192.168.143.89:3000/auth/signin', {
+                matricule: matricule.trim(),
+                password: password.trim(),
+            });
+
+            if (response.status === 200) {
+                const utilisateur = response.data.user; // les infos utilisateur reçues du serveur
+                Alert.alert('Succès', 'Connexion réussie !');
+
+                // Navigation vers la page Accueil avec les données utilisateur
+                navigation.navigate('Accueil', { user: utilisateur });
+            } else {
+                Alert.alert('Erreur', 'Connexion échouée');
+            }
+        } catch (error) {
+            console.error('Erreur axios :', error);
+            if (error.response && error.response.data && error.response.data.message) {
+                Alert.alert('Erreur', error.response.data.message);
+            } else {
+                Alert.alert('Erreur', 'Impossible de se connecter au serveur');
+            }
+        }
+    };
+
     return (
         <SafeAreaView style={styles.root}>
-
-            <Image style={{width:300, height:200}}
-                source={require('../../assets/images/svg/undraw_book-lover_f1dq.png')} />
+            <Image
+                style={{ width: 300, height: 200, alignSelf: 'center' }}
+                source={require('../../assets/images/svg/undraw_book-lover_f1dq.png')}
+            />
             <Text style={styles.title}>Bienvenue à UPL-BookZone</Text>
-            {/* Zone de saisie */}
+
             <View style={styles.inputContainer}>
-                <Entypo name="email" size={20} color="#666" style={{marginRight: 5}}/>
-                <TextInput style={styles.input} placeholder={"Entrer votre email"}/>
+                <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
+                <TextInput
+                    style={styles.input}
+                    keyboardType="default"
+                    placeholder="Entrer votre matricule"
+                    value={matricule}
+                    onChangeText={setMatricule}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
             </View>
 
             <View style={styles.inputContainer}>
-                <MaterialIcons
-                    name="security"
-                    size={20} color="#666"
-                    style={{marginRight: 5}}/>
-                <TextInput style={styles.input} placeholder={"Entrer votre mots de passe"} secureTextEntry/>
-
-                <TouchableOpacity>
-                    <Text style={{color: '#0065ff'}}>Oublié ?</Text>
+                <MaterialIcons name="security" size={20} color="#666" style={{ marginRight: 5 }} />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Entrer votre mot de passe"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+                <TouchableOpacity onPress={() => Alert.alert('Mot de passe oublié', 'Fonction à implémenter')}>
+                    <Text style={{ color: '#0065ff' }}>Oublié ?</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Button Action */}
-
-            <TouchableOpacity style={styles.touchableButton1}>
+            <TouchableOpacity style={styles.touchableButton1} onPress={handleSignIn}>
                 <Text style={styles.touchableText}>Se connecter</Text>
             </TouchableOpacity>
 
@@ -58,8 +112,9 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: '500',
         color: '#333',
-        marginTop : 20,
-        marginBottom : 10
+        marginTop: 20,
+        marginBottom: 10,
+        textAlign: 'center',
     },
     inputContainer: {
         flexDirection: 'row',
@@ -67,32 +122,34 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
         paddingHorizontal: 8,
-        marginBottom : 25
+        marginBottom: 25,
     },
-    input : {
+    input: {
         flex: 1,
+        height: 40,
+        color: '#000',
     },
-    touchableButton1:{
-        marginBottom : 30,
-        borderRadius : 20,
-        padding : 20,
+    touchableButton1: {
+        marginBottom: 30,
+        borderRadius: 20,
+        padding: 20,
         backgroundColor: '#0065ff',
     },
     touchableText: {
         textAlign: 'center',
         fontWeight: '700',
-        fontSize : 16,
+        fontSize: 16,
         color: '#fff',
     },
-    touchableButton2:{
-        marginBottom : 30,
-        borderRadius : 20,
-        padding : 20,
+    touchableButton2: {
+        marginBottom: 30,
+        borderRadius: 20,
+        padding: 20,
         backgroundColor: '#fffb00',
     },
-    textCenter:{
+    textCenter: {
         textAlign: 'center',
         fontWeight: '700',
-        fontSize : 16,
-    }
-})
+        fontSize: 16,
+    },
+});
