@@ -6,12 +6,13 @@ import LoginScreen from "./src/ecrans/LoginScreen";
 import SignInScreen from "./src/ecrans/SignInScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import Navigation from "./src/routes/Navigation";
+import WelcomeScreen from "./src/WelcomeScreen";
 
 const App = () => {
 
     return (
         <SafeAreaView style={styles.root}>
-            <Navigation />
+            <Navigation/>
         </SafeAreaView>
     );
 };
