@@ -1,24 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
 
-const Accueil = ({ route }) => {
-    // Sécuriser l'accès aux données utilisateur
-    const user = route?.params?.user;
+const Accueil = () => {
+    const [users, setUsers] = useState([]);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://192.168.143.89:3000/api/users');
+            setUsers(response.data);
+        } catch (error) {
+            Alert.alert('Erreur', 'Impossible de récupérer les utilisateurs');
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const renderItem = ({ item }) => (
+        <View style={styles.userContainer}>
+            <Text style={styles.name}>{item.fullName}</Text>
+            <Text>Email: {item.email}</Text>
+            <Text>Téléphone: {item.phone}</Text>
+            <Text>Matricule: {item.matricule}</Text>
+            <Text>Date de naissance: {item.birthDate}</Text>
+        </View>
+    );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Bienvenue 👋</Text>
-            {user ? (
-                <>
-                    <Text style={styles.text}>Nom : {user.fullName}</Text>
-                    <Text style={styles.text}>Email : {user.email}</Text>
-                    <Text style={styles.text}>Matricule : {user.matricule}</Text>
-                </>
-            ) : (
-                <Text style={styles.text}>Aucune donnée utilisateur reçue.</Text>
-            )}
-        </SafeAreaView>
+        <View style={styles.container}>
+            <Text style={styles.title}>Liste des utilisateurs</Text>
+            <FlatList
+                data={users}
+                keyExtractor={item => item.id.toString()}
+                renderItem={renderItem}
+                ListEmptyComponent={<Text>Aucun utilisateur trouvé</Text>}
+            />
+        </View>
     );
 };
 
@@ -27,20 +47,23 @@ export default Accueil;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        padding: 20,
         backgroundColor: 'white',
-        paddingHorizontal: 20,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
+        fontSize: 22,
+        fontWeight: '700',
+        marginBottom: 15,
     },
-    text: {
+    userContainer: {
+        padding: 15,
+        marginBottom: 15,
+        backgroundColor: '#f0f0f0',
+        borderRadius: 8,
+    },
+    name: {
+        fontWeight: '700',
         fontSize: 16,
-        marginBottom: 10,
-        color: '#555',
+        marginBottom: 5,
     },
 });

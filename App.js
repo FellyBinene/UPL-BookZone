@@ -7,12 +7,14 @@ import SignInScreen from "./src/ecrans/SignInScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import Navigation from "./src/routes/Navigation";
 import WelcomeScreen from "./src/WelcomeScreen";
+import ListUsers from "./sessions/admin/ListUsers";
+import AddBook from "./sessions/admin/addBook";
 
 const App = () => {
 
     return (
         <SafeAreaView style={styles.root}>
-            <Navigation/>
+            <AddBook/>
         </SafeAreaView>
     );
 };
