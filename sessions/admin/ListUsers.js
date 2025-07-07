@@ -35,7 +35,7 @@ const ListUsers = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://192.168.143.89:3000/api/recup-users')
+        fetch('http://172.30.26.20:4000/api/recup-users')
             .then((res) => {
                 if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
                 return res.json();
@@ -46,7 +46,7 @@ const ListUsers = () => {
             })
             .catch((err) => {
                 console.error('Erreur chargement :', err);
-                setError('Impossible de récupérer les utilisateurs.');
+                setError(err.message || 'Impossible de récupérer les utilisateurs.');
                 setLoading(false);
             });
     }, []);

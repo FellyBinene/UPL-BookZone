@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liste des livres</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+<h1 class="text-3xl font-bold text-indigo-700 mb-8 text-center">📚 Liste des livres</h1>
+
+<div id="booksContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+<script>
+  async function fetchBooks() {
+    try {
+      const res = await fetch('/api/books');
+      if (!res.ok) throw new Error('Erreur API: ' + res.status);
+      const books = await res.json();
+
+      const container = document.getElementById('booksContainer');
+      container.innerHTML = '';
+
+      if (books.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-600">Aucun livre enregistré.</p>';
+        return;
+      }
+
+      books.forEach(book => {
+        const isImage = book.fichier_type.startsWith('image');
+        const fileUrl = `/uploads/${isImage ? 'images' : 'files'}/${book.fichier_nom}`;
+        const coverUrl = `/uploads/images/${book.image_nom}`;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded-lg shadow-md flex flex-col';
+
+        card.innerHTML = `
+            <img src="${coverUrl}" alt="Couverture de ${book.titre}" class="w-full h-48 object-cover rounded mb-4" />
+            <h2 class="text-xl font-semibold text-indigo-700 mb-2">${book.titre}</h2>
+            <p><strong>Auteur :</strong> ${book.auteur}</p>
+            <p><strong>Genre :</strong> ${book.genre}</p>
+            <p class="text-gray-700 mb-4">${book.resume}</p>
+            <a href="${fileUrl}" target="_blank" class="mt-auto inline-block bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700 transition text-center">
+              Voir le fichier
+            </a>
+          `;
+
+        container.appendChild(card);
+      });
+    } catch (error) {
+      const container = document.getElementById('booksContainer');
+      container.innerHTML = `<p class="text-center text-red-600">Erreur lors du chargement des livres.</p>`;
+      console.error(error);
+    }
+  }
+
+  fetchBooks();
+</script>
+</body>
+</html>

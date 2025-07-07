@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://192.168.143.89:3000/auth/signin', {
+            const response = await axios.post('http://172.30.26.20:4000/auth/signin', {
                 matricule: matricule.trim(),
                 password: password.trim(),
             });
@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
                 Alert.alert('Succès', 'Connexion réussie !');
 
                 // Navigation vers la page Accueil avec les données utilisateur
-                navigation.navigate('Accueil', { user: utilisateur });
+                navigation.navigate('DisplayBook', { user: utilisateur });
             } else {
                 Alert.alert('Erreur', 'Connexion échouée');
             }

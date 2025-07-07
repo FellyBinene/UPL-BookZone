@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Gestion des livres</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+<div class="flex justify-between items-center mb-6 max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-indigo-700">📚 Administration des livres</h1>
+    <a href="index.html" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
+        ➕ Ajouter un livre
+    </a>
+</div>
+
+<!-- Tableau des livres -->
+<section class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4">Liste des livres</h2>
+    <table class="w-full table-auto border-collapse border border-gray-300 text-left">
+        <thead>
+        <tr class="bg-indigo-100">
+            <th class="border px-3 py-2">#</th>
+            <th class="border px-3 py-2">Titre</th>
+            <th class="border px-3 py-2">Auteur</th>
+            <th class="border px-3 py-2">Genre</th>
+            <th class="border px-3 py-2">Image couverture</th>
+            <th class="border px-3 py-2">Fichier</th>
+            <th class="border px-3 py-2">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="booksTableBody"></tbody>
+    </table>
+    <div id="tableMessage" class="mt-2 text-center font-medium"></div>
+</section>
+
+<!-- Modal modification -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg shadow-lg max-w-xl w-full p-6 relative">
+        <h3 class="text-xl font-semibold mb-4">Modifier le livre</h3>
+        <form id="editForm" class="space-y-4">
+            <input type="hidden" id="edit_id" />
+            <input type="text" id="edit_titre" placeholder="Titre" class="w-full border px-3 py-2 rounded" required />
+            <input type="text" id="edit_auteur" placeholder="Auteur" class="w-full border px-3 py-2 rounded" required />
+            <input type="text" id="edit_genre" placeholder="Genre" class="w-full border px-3 py-2 rounded" required />
+            <textarea id="edit_resume" placeholder="Résumé" rows="3" class="w-full border px-3 py-2 rounded" required></textarea>
+            <label class="block font-semibold">Nouvelle image couverture (optionnel) :</label>
+            <input type="file" id="edit_image" accept="image/*" class="w-full border px-3 py-2 rounded" />
+            <label class="block font-semibold">Nouveau fichier (optionnel) :</label>
+            <input type="file" id="edit_fichier" accept="application/pdf,image/*" class="w-full border px-3 py-2 rounded" />
+            <div class="flex justify-end gap-4">
+                <button type="button" id="cancelEditBtn" class="border px-4 py-2 rounded hover:bg-gray-100">Annuler</button>
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Enregistrer</button>
+            </div>
+        </form>
+        <div id="editMessage" class="mt-2 text-center font-medium"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = '/api/books';
+
+    async function loadBooks() {
+        const tbody = document.getElementById('booksTableBody');
+        const tableMessage = document.getElementById('tableMessage');
+        tbody.innerHTML = '';
+        tableMessage.textContent = '';
+
+        try {
+            const res = await fetch(API_URL);
+            if (!res.ok) throw new Error('Erreur API');
+            const books = await res.json();
+
+            if (books.length === 0) {
+                tableMessage.textContent = 'Aucun livre disponible.';
+                return;
+            }
+
+            books.forEach((book, index) => {
+                const isImage = book.fichier_type.startsWith('image');
+                const fileUrl = `/uploads/${isImage ? 'images' : 'files'}/${book.fichier_nom}`;
+                const coverUrl = `/uploads/images/${book.image_nom}`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+            <td class="border px-2 py-1">${index + 1}</td>
+            <td class="border px-2 py-1">${book.titre}</td>
+            <td class="border px-2 py-1">${book.auteur}</td>
+            <td class="border px-2 py-1">${book.genre}</td>
+            <td class="border px-2 py-1 text-center">
+              <img src="${coverUrl}" alt="Couverture" class="h-16 mx-auto rounded" />
+            </td>
+            <td class="border px-2 py-1 text-center">
+              <a href="${fileUrl}" target="_blank" class="text-indigo-600 hover:underline">Ouvrir</a>
+            </td>
+            <td class="border px-2 py-1 text-center space-x-2">
+              <button class="editBtn bg-yellow-400 px-3 py-1 rounded hover:bg-yellow-500" data-id="${book.id}">Modifier</button>
+              <button class="deleteBtn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${book.id}">Supprimer</button>
+            </td>
+          `;
+                tbody.appendChild(tr);
+            });
+        } catch (err) {
+            tableMessage.textContent = 'Erreur lors du chargement.';
+            console.error(err);
+        }
+    }
+
+    // Modal : ouvrir / fermer
+    document.getElementById('booksTableBody').addEventListener('click', e => {
+        if (e.target.classList.contains('editBtn')) openEditModal(e.target.dataset.id);
+        if (e.target.classList.contains('deleteBtn')) deleteBook(e.target.dataset.id);
+    });
+
+    function openEditModal(id) {
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(books => {
+                const book = books.find(b => b.id == id);
+                if (!book) return alert('Introuvable');
+                document.getElementById('edit_id').value = book.id;
+                document.getElementById('edit_titre').value = book.titre;
+                document.getElementById('edit_auteur').value = book.auteur;
+                document.getElementById('edit_genre').value = book.genre;
+                document.getElementById('edit_resume').value = book.resume;
+                document.getElementById('editModal').classList.remove('hidden');
+            });
+    }
+
+    document.getElementById('cancelEditBtn').addEventListener('click', () => {
+        document.getElementById('editModal').classList.add('hidden');
+    });
+
+    document.getElementById('editForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const id = document.getElementById('edit_id').value;
+        const formData = new FormData();
+        formData.append('titre', document.getElementById('edit_titre').value);
+        formData.append('auteur', document.getElementById('edit_auteur').value);
+        formData.append('genre', document.getElementById('edit_genre').value);
+        formData.append('resume', document.getElementById('edit_resume').value);
+        if (document.getElementById('edit_image').files[0]) {
+            formData.append('image', document.getElementById('edit_image').files[0]);
+        }
+        if (document.getElementById('edit_fichier').files[0]) {
+            formData.append('fichier', document.getElementById('edit_fichier').files[0]);
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('editMessage').textContent = '✅ Modifié.';
+                loadBooks();
+                setTimeout(() => document.getElementById('editModal').classList.add('hidden'), 1000);
+            } else {
+                document.getElementById('editMessage').textContent = '❌ ' + (data.message || 'Erreur');
+            }
+        } catch (err) {
+            console.error(err);
+            document.getElementById('editMessage').textContent = '❌ Erreur serveur.';
+        }
+    });
+
+    async function deleteBook(id) {
+        if (!confirm('Supprimer ce livre ?')) return;
+        try {
+            const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) loadBooks();
+            else alert('Erreur : ' + data.message);
+        } catch (err) {
+            console.error(err);
+            alert('Erreur de suppression.');
+        }
+    }
+
+    loadBooks();
+</script>
+</body>
+</html>
