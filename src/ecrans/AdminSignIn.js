@@ -14,37 +14,13 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
 
-const SignInScreen = ({ navigation }) => {
-    const [birthDate, setBirthDate] = useState(new Date());
+const AdminSignIn = ({ navigation }) => {
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [matricule, setMatricule] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-
-    const showDatePicker = () => {
-        Alert.alert(
-            "Information",
-            "Veuillez choisir votre date de naissance.",
-            [
-                {
-                    text: "Continuer",
-                    onPress: () => {
-                        DateTimePickerAndroid.open({
-                            value: birthDate,
-                            onChange: (event, selectedDate) => {
-                                const currentDate = selectedDate || birthDate;
-                                setBirthDate(currentDate);
-                            },
-                            mode: 'date',
-                            is24Hour: true,
-                        });
-                    }
-                }
-            ]
-        );
-    };
 
     const handleSignUp = async () => {
         if (email && fullName && phone && matricule && password && confirmPassword) {
@@ -54,10 +30,9 @@ const SignInScreen = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://192.168.101.89:4000/api/users', {
+                const response = await axios.post('http://192.168.101.89:4000/api/admins', {
                     email,
                     fullName,
-                    birthDate: birthDate.toISOString().split('T')[0],
                     phone,
                     matricule,
                     password,
@@ -65,7 +40,7 @@ const SignInScreen = ({ navigation }) => {
 
                 if (response.status === 201) {
                     Alert.alert('Succès', 'Inscription réussie');
-                    navigation.navigate('Connexion');
+                    navigation.navigate('ConAdmin');
                 }
             } catch (error) {
                 console.error('Erreur axios :', error);
@@ -92,18 +67,6 @@ const SignInScreen = ({ navigation }) => {
                     value={fullName}
                     onChangeText={setFullName}
                 />
-            </View>
-
-            <View style={styles.inputContainer}>
-                <Entypo name="calendar" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TouchableOpacity onPress={showDatePicker} style={{ flex: 1, paddingBottom: 5 }}>
-                    <Text style={{ marginBottom: 5, color: '#555' }}>
-                        Date de naissance :
-                    </Text>
-                    <Text style={{ color: '#333' }}>
-                        {birthDate.toLocaleDateString()}
-                    </Text>
-                </TouchableOpacity>
             </View>
 
             <View style={styles.inputContainer}>
@@ -167,7 +130,7 @@ const SignInScreen = ({ navigation }) => {
 
             <TouchableOpacity
                 style={styles.touchableButton2}
-                onPress={() => navigation.navigate('Connexion')}
+                onPress={() => navigation.navigate('ConAdmin')}
             >
                 <Text style={styles.textCenter}>Se connecter</Text>
             </TouchableOpacity>
@@ -175,7 +138,7 @@ const SignInScreen = ({ navigation }) => {
     );
 };
 
-export default SignInScreen;
+export default AdminSignIn;
 
 const styles = StyleSheet.create({
     root: {

@@ -22,7 +22,7 @@ const DisplayBook = () => {
 
     const fetchBooks = async () => {
         try {
-            const response = await axios.get('http://172.30.26.20:4000/api/books');
+            const response = await axios.get('http://192.168.101.89:4000/api/books');
             setBooks(response.data);
         } catch (error) {
             console.error('Erreur de chargement des livres:', error);
@@ -37,8 +37,8 @@ const DisplayBook = () => {
 
     const renderItem = ({ item }) => {
         const isImage = item.fichier_type?.startsWith('image');
-        const fileUrl = `http://172.30.26.20:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
-        const imageUrl = `http://172.30.26.20:4000/uploads/images/${item.image_nom}`;
+        const fileUrl = `http://192.168.101.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
+        const imageUrl = `http://192.168.101.89:4000/uploads/images/${item.image_nom}`;
 
         return (
             <View style={styles.card}>

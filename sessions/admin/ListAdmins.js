@@ -15,32 +15,19 @@ import { Entypo, Feather, MaterialIcons } from '@expo/vector-icons';
 
 const TableHeader = () => (
     <View style={[styles.row, styles.header]}>
-        {['ID', 'Email', 'Full Name', 'Birth Date', 'Phone', 'Matricule', 'Created At', 'Actions'].map((title) => (
-            <Text
-                key={title}
-                style={[
-                    styles.cell,
-                    styles.bold,
-                    title === 'Actions' && { width: 120 },
-                ]}
-            >
+        {['ID', 'Email', 'Full Name', 'Phone', 'Matricule', 'Created At', 'Actions'].map((title) => (
+            <Text key={title} style={[styles.cell, styles.bold, title === 'Actions' && { width: 120 }]}>
                 {title}
             </Text>
         ))}
     </View>
 );
 
-const UserRow = ({ user, index, onEdit, onDelete }) => (
-    <View
-        style={[
-            styles.row,
-            index % 2 === 0 ? styles.evenRow : styles.oddRow,
-        ]}
-    >
+const AdminRow = ({ user, index, onEdit, onDelete }) => (
+    <View style={[styles.row, index % 2 === 0 ? styles.evenRow : styles.oddRow]}>
         <Text style={styles.cell}>{user.id}</Text>
         <Text style={styles.cell}>{user.email}</Text>
         <Text style={styles.cell}>{user.fullName}</Text>
-        <Text style={styles.cell}>{user.birthDate}</Text>
         <Text style={styles.cell}>{user.phone}</Text>
         <Text style={styles.cell}>{user.matricule}</Text>
         <Text style={styles.cell}>{user.created_at}</Text>
@@ -56,37 +43,36 @@ const UserRow = ({ user, index, onEdit, onDelete }) => (
     </View>
 );
 
-const ListUsers = () => {
-    const [users, setUsers] = useState([]);
+const ListAdmins = () => {
+    const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
 
     useEffect(() => {
-        fetch('http://192.168.101.89:4000/api/recup-users')
+        fetch('http://192.168.101.89:4000/api/recup-admins')
             .then((res) => {
                 if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
                 return res.json();
             })
             .then((data) => {
-                setUsers(data);
+                setAdmins(data);
                 setLoading(false);
             })
             .catch((err) => {
                 console.error('Erreur chargement :', err);
-                setError(err.message || 'Impossible de récupérer les utilisateurs.');
+                setError(err.message || 'Impossible de récupérer les administrateurs.');
                 setLoading(false);
             });
     }, []);
 
-    const filteredUsers = users.filter(
-        (u) =>
-            u.email.toLowerCase().includes(search.toLowerCase()) ||
-            u.fullName.toLowerCase().includes(search.toLowerCase()) ||
-            u.matricule.toLowerCase().includes(search.toLowerCase())
+    const filteredAdmins = admins.filter((a) =>
+        a.email.toLowerCase().includes(search.toLowerCase()) ||
+        a.fullName.toLowerCase().includes(search.toLowerCase()) ||
+        a.matricule.toLowerCase().includes(search.toLowerCase())
     );
 
-    // Callbacks simples à remplacer par ta logique
+    // Callbacks à compléter selon ta logique
     const handleAdd = () => Alert.alert('Ajouter', 'Fonction Ajouter à implémenter');
     const handleEdit = (user) => Alert.alert('Modifier', `Modifier l’utilisateur ${user.fullName}`);
     const handleDelete = (id) => Alert.alert('Supprimer', `Supprimer l’utilisateur ID ${id}?`);
@@ -101,17 +87,12 @@ const ListUsers = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>📋 Liste des utilisateurs</Text>
+            <Text style={styles.title}>🛡️ Liste des administrateurs</Text>
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* 🔍 Barre de recherche */}
             <View style={styles.searchBar}>
-                <Entypo
-                    name="magnifying-glass"
-                    size={20}
-                    color="#000"
-                    style={styles.icon}
-                />
+                <Entypo name="magnifying-glass" size={20} color="#000" style={styles.icon} />
                 <TextInput
                     placeholder="Rechercher (email, nom, matricule)..."
                     placeholderTextColor="#999"
@@ -132,14 +113,14 @@ const ListUsers = () => {
             <ScrollView horizontal style={styles.tableWrapper} contentContainerStyle={{ paddingVertical: 8 }}>
                 <View>
                     <TableHeader />
-                    {filteredUsers.length === 0 ? (
-                        <Text style={styles.emptyText}>Aucun utilisateur trouvé.</Text>
+                    {filteredAdmins.length === 0 ? (
+                        <Text style={styles.emptyText}>Aucun administrateur trouvé.</Text>
                     ) : (
                         <FlatList
-                            data={filteredUsers}
+                            data={filteredAdmins}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item, index }) => (
-                                <UserRow
+                                <AdminRow
                                     user={item}
                                     index={index}
                                     onEdit={handleEdit}
@@ -310,4 +291,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ListUsers;
+export default ListAdmins;

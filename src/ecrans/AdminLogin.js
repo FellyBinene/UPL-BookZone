@@ -13,7 +13,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 
-const LoginScreen = ({ navigation }) => {
+const AdminLogin = ({ navigation }) => {
     const [matricule, setMatricule] = useState('');
     const [password, setPassword] = useState('');
 
@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://192.168.101.89:4000/auth/signin', {
+            const response = await axios.post('http://192.168.101.89:4000/authAdmin/signinAdmin', {
                 matricule: matricule.trim(),
                 password: password.trim(),
             });
@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
                 Alert.alert('Succès', 'Connexion réussie !');
 
                 // Navigation vers la page Accueil avec les données utilisateur
-                navigation.navigate('DisplayBook', { user: utilisateur });
+                navigation.navigate('Home', { user: utilisateur });
             } else {
                 Alert.alert('Erreur', 'Connexion échouée');
             }
@@ -52,9 +52,9 @@ const LoginScreen = ({ navigation }) => {
         <SafeAreaView style={styles.root}>
             <Image
                 style={{ width: 300, height: 200, alignSelf: 'center' }}
-                source={require('../../assets/images/svg/undraw_book-lover_f1dq.png')}
+                source={require('../../assets/images/svg/admin.png')}
             />
-            <Text style={styles.title}>Bienvenue à UPL-BookZone</Text>
+            <Text style={styles.title}>Administrateurs</Text>
 
             <View style={styles.inputContainer}>
                 <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
@@ -89,17 +89,11 @@ const LoginScreen = ({ navigation }) => {
                 <Text style={styles.touchableText}>Se connecter</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-                style={styles.touchableButton2}
-                onPress={() => navigation.navigate('Inscription')}
-            >
-                <Text style={styles.textCenter}>S'inscrire</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
 
-export default LoginScreen;
+export default AdminLogin;
 
 const styles = StyleSheet.create({
     root: {

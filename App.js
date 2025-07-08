@@ -2,19 +2,22 @@ import {AppRegistry,} from "react-native";
 import app from './app.json';
 import React from 'react';
 import {SafeAreaView, StyleSheet, Text} from "react-native";
-import LoginScreen from "./src/ecrans/LoginScreen";
-import SignInScreen from "./src/ecrans/SignInScreen";
 import {NavigationContainer} from "@react-navigation/native";
 import Navigation from "./src/routes/Navigation";
 import WelcomeScreen from "./src/WelcomeScreen";
 import ListUsers from "./sessions/admin/ListUsers";
-import DisplayBook from "./sessions/admin/DisplayBook";
+import ListAdmins from "./sessions/admin/ListAdmins";
+import Footer from "./sessions/admin/components/FooterAdmin";
+import Header from "./sessions/admin/components/HeaderAdmin";
+import Accueil from "./sessions/user/Accueil";
+import HomeScreen from "./sessions/admin/HomeScreen";
+
 
 const App = () => {
 
     return (
         <SafeAreaView style={styles.root}>
-            <ListUsers />
+            <Navigation />
         </SafeAreaView>
     );
 };

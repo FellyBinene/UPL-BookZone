@@ -11,7 +11,10 @@ const sequelize = require('./config/db');
 // Importation des routes externes
 const usersRoutes = require('./routes/users');
 const recupUsersRoute = require('./routes/RecupUsers');
+const recupAdminsRoute = require('./routes/RecupAdmins');
 const authRoutes = require('./routes/auth');
+const adminsRoutes = require('./routes/admins');
+const authAdminRoutes = require('./routes/authAdmins');
 
 const app = express();
 const PORT = 4000;
@@ -23,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Fichiers statiques
 app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
-app.use('/uploads/pdfs', express.static(path.join(__dirname, 'uploads/files')));
+app.use('/uploads/files', express.static(path.join(__dirname, 'uploads/files')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Logger
@@ -63,7 +66,10 @@ const upload = multer({ storage });
 // Routes API externes
 app.use('/api/users', usersRoutes);
 app.use('/api/recup-users', recupUsersRoute);
+app.use('/api/recup-admins', recupAdminsRoute);
 app.use('/auth', authRoutes);
+app.use('/api/admins', adminsRoutes);
+app.use('/authAdmin', authAdminRoutes);
 
 // Routes API livres
 app.get('/api/books', async (req, res) => {
