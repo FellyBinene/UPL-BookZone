@@ -20,7 +20,10 @@ router.post('/signin', (req, res) => {
         }
 
         if (results.length > 0) {
-            res.status(200).json({ message: 'Connexion réussie' });
+            const user = { ...results[0] };
+            delete user.password; // Ne jamais renvoyer le mot de passe
+
+            res.status(200).json({ message: 'Connexion réussie', user }); // 👈 ici on renvoie l'utilisateur
         } else {
             res.status(401).json({ message: 'Matricule ou mot de passe incorrect' });
         }

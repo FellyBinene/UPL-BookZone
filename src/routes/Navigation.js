@@ -12,6 +12,8 @@ import AdminLogin from "../ecrans/AdminLogin";
 import PDFViewerScreen from "../../sessions/visitors/PDFViewerScreen";
 import HomeScreen from "../../sessions/admin/HomeScreen";
 import ListBooks from "@/sessions/admin/ListBooks";
+import HomeScreenUsers from "../../sessions/user/HomeScreenUsers";
+import UserProfile from '../../sessions/user/UserProfile';
 
 const Navigation = () => {
     const Stack = createNativeStackNavigator();
@@ -19,7 +21,7 @@ const Navigation = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName="InsAdmin"
+                initialRouteName="Connexion"
                 screenOptions={{ headerShown: false }}
             >
                 <Stack.Screen name="Connexion" component={LoginScreen} />
@@ -31,8 +33,9 @@ const Navigation = () => {
                 <Stack.Screen name="ListUsers" component={ListUsers} />
                 <Stack.Screen name="PDFViewer" component={PDFViewerScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
+                <Stack.Screen name="HomeUsers" component={HomeScreenUsers} />
                 <Stack.Screen name="ListBooks" component={ListBooks} />
-
+                <Stack.Screen name="UserProfile" component={UserProfile} />
             </Stack.Navigator>
         </NavigationContainer>
     );

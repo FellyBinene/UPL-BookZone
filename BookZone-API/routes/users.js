@@ -28,4 +28,22 @@ router.post('/', (req, res) => {
     });
 });
 
+router.get('/users/:matricule', (req, res) => {
+    const { matricule } = req.params;
+    const query = 'SELECT * FROM users WHERE matricule = ?';
+
+    connection.query(query, [matricule], (err, results) => {
+        if (err) {
+            console.error('Erreur serveur:', err);
+            return res.status(500).json({ error: 'Erreur serveur' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        }
+
+        res.json(results[0]);
+    });
+});
+
 module.exports = router;

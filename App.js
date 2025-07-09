@@ -11,7 +11,8 @@ import Footer from "./sessions/admin/components/FooterAdmin";
 import Header from "./sessions/admin/components/HeaderAdmin";
 import Accueil from "./sessions/user/Accueil";
 import HomeScreen from "./sessions/admin/HomeScreen";
-
+import HomeScreenUsers from "./sessions/user/HomeScreenUsers"
+import UserProfile from "./sessions/user/UserProfile";
 
 const App = () => {
 

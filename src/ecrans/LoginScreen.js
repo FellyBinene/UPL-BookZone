@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 ajouté ici
 
 const LoginScreen = ({ navigation }) => {
     const [matricule, setMatricule] = useState('');
@@ -30,14 +31,12 @@ const LoginScreen = ({ navigation }) => {
             });
 
             if (response.status === 200) {
-                const utilisateur = response.data.user; // les infos utilisateur reçues du serveur
+                console.log('Données retournées par le serveur :', response.data);
+                const utilisateur = response.data.user;  // ici !
                 Alert.alert('Succès', 'Connexion réussie !');
-
-                // Navigation vers la page Accueil avec les données utilisateur
-                navigation.navigate('DisplayBook', { user: utilisateur });
-            } else {
-                Alert.alert('Erreur', 'Connexion échouée');
+                navigation.navigate('HomeUsers', { user: utilisateur });
             }
+
         } catch (error) {
             console.error('Erreur axios :', error);
             if (error.response && error.response.data && error.response.data.message) {
@@ -95,6 +94,12 @@ const LoginScreen = ({ navigation }) => {
             >
                 <Text style={styles.textCenter}>S'inscrire</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+                onPress={() => navigation.navigate('ConAdmin')}
+            >
+                <Text style={styles.textCenter1}>Connexion Admin</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -149,6 +154,11 @@ const styles = StyleSheet.create({
     },
     textCenter: {
         textAlign: 'center',
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    textCenter1: {
+        textAlign: 'left',
         fontWeight: '700',
         fontSize: 16,
     },

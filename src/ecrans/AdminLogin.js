@@ -89,6 +89,11 @@ const AdminLogin = ({ navigation }) => {
                 <Text style={styles.touchableText}>Se connecter</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+                onPress={() => navigation.navigate('Connexion')}
+            >
+                <Text style={styles.textCenter}>Connexion User</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fffb00',
     },
     textCenter: {
-        textAlign: 'center',
+        textAlign: 'left',
         fontWeight: '700',
         fontSize: 16,
     },

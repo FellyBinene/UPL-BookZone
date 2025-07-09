@@ -11,10 +11,12 @@ import {
     Dimensions,
 } from 'react-native';
 import axios from 'axios';
+import * as Animatable from 'react-native-animatable';
 
-const numColumns = 2; // Change à 3 si tu veux 3 livres par ligne
+const numColumns = 2;
 const screenWidth = Dimensions.get('window').width;
-const cardWidth = (screenWidth - 48) / numColumns; // 16px padding * 2 + 8px margin entre cartes
+const spacing = 8;
+const cardWidth = (screenWidth - spacing * (numColumns + 1)) / numColumns;
 
 const DisplayBook = () => {
     const [books, setBooks] = useState([]);
@@ -35,21 +37,26 @@ const DisplayBook = () => {
         fetchBooks();
     }, []);
 
-    const renderItem = ({ item }) => {
+    const renderItem = ({ item, index }) => {
         const isImage = item.fichier_type?.startsWith('image');
         const fileUrl = `http://192.168.101.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
         const imageUrl = `http://192.168.101.89:4000/uploads/images/${item.image_nom}`;
 
         return (
-            <View style={styles.card}>
-                <TouchableOpacity onPress={() => Linking.openURL(fileUrl)}>
+            <Animatable.View
+                animation="fadeInUp"
+                delay={index * 100}
+                duration={500}
+                useNativeDriver
+                style={styles.cardWrapper}
+            >
+                <TouchableOpacity onPress={() => Linking.openURL(fileUrl)} activeOpacity={0.9} style={styles.card}>
                     <Image source={{ uri: imageUrl }} style={styles.cover} />
+                    <Text style={styles.title}>{item.titre}</Text>
+                    <Text><Text style={styles.label}>Auteur :</Text> {item.auteur}</Text>
+                    <Text><Text style={styles.label}>Genre :</Text> {item.genre}</Text>
                 </TouchableOpacity>
-
-                <Text style={styles.title}>{item.titre}</Text>
-                <Text><Text style={styles.label}>Auteur :</Text> {item.auteur}</Text>
-                <Text><Text style={styles.label}>Genre :</Text> {item.genre}</Text>
-            </View>
+            </Animatable.View>
         );
     };
 
@@ -69,32 +76,35 @@ const DisplayBook = () => {
             renderItem={renderItem}
             contentContainerStyle={styles.container}
             numColumns={numColumns}
-            columnWrapperStyle={{ justifyContent: 'space-between' }}
+            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: spacing }}
         />
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
+        padding: spacing,
         backgroundColor: '#f3f4f6',
     },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 12,
-        marginBottom: 16,
+    cardWrapper: {
         width: cardWidth,
-        elevation: 3,
+    },
+    card: {
+        backgroundColor: '#ffffff',
+        borderRadius: 16,
+        padding: 12,
+        elevation: 6,
         shadowColor: '#000',
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 4 },
+        margin: 5
     },
     cover: {
         width: '100%',
-        height: 120,
-        borderRadius: 8,
-        marginBottom: 8,
+        height: 140,
+        borderRadius: 10,
+        marginBottom: 10,
     },
     title: {
         fontSize: 16,
@@ -110,6 +120,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 100,
     },
 });
 
