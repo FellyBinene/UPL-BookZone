@@ -16,6 +16,10 @@ const authRoutes = require('./routes/auth');
 const adminsRoutes = require('./routes/admins');
 const authAdminRoutes = require('./routes/authAdmins');
 
+// server.js ou app.js
+const booksRoutes = require('./routes/books');
+
+
 const app = express();
 const PORT = 4000;
 
@@ -28,6 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads/images', express.static(path.join(__dirname, 'uploads/images')));
 app.use('/uploads/files', express.static(path.join(__dirname, 'uploads/files')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/api/books', booksRoutes);
 
 // Logger
 app.use((req, res, next) => {
@@ -46,6 +51,22 @@ const Book = sequelize.define('Book', {
     image_nom: DataTypes.STRING,
     image_type: DataTypes.STRING
 });
+
+// Définition du modèle Notification
+const Notification = sequelize.define('Notification', {
+    message: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    seen: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    }
+});
+
+// Association Notification <-> Book
+Notification.belongsTo(Book, { foreignKey: 'bookId' });
+Book.hasMany(Notification, { foreignKey: 'bookId' });
 
 // Multer
 const storage = multer.diskStorage({
@@ -81,6 +102,7 @@ app.get('/api/books', async (req, res) => {
     }
 });
 
+// Upload livre + créer notification
 app.post('/api/books/upload', upload.fields([
     { name: 'fichier', maxCount: 1 },
     { name: 'image', maxCount: 1 }
@@ -103,6 +125,13 @@ app.post('/api/books/upload', upload.fields([
             fichier_type: fichier.mimetype,
             image_nom: image.filename,
             image_type: image.mimetype
+        });
+
+        // Création d'une notification pour ce nouveau livre
+        await Notification.create({
+            bookId: newBook.id,
+            message: `Nouveau livre ajouté : ${titre}`,
+            seen: false
         });
 
         res.json({ success: true, bookId: newBook.id });
@@ -172,8 +201,41 @@ app.delete('/api/books/:id', async (req, res) => {
     }
 });
 
+// Récupérer notifications non vues avec livre associé
+app.get('/api/notifications', async (req, res) => {
+    try {
+        const notifications = await Notification.findAll({
+            where: { seen: false },
+            include: [{ model: Book }],
+            order: [['createdAt', 'DESC']],
+            limit: 5
+        });
+        res.json({ success: true, notifications });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Erreur serveur' });
+    }
+});
+
+// Marquer notification comme vue
+app.put('/api/notifications/:id/seen', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const notif = await Notification.findByPk(id);
+        if (!notif) return res.status(404).json({ success: false, message: 'Notification non trouvée' });
+
+        notif.seen = true;
+        await notif.save();
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Erreur serveur' });
+    }
+});
+
 // Lancer le serveur
-sequelize.sync().then(() => {
+sequelize.sync({ alter: true }).then(() => {
     app.listen(PORT, () => {
         console.log(`✅ Serveur démarré sur http://localhost:${PORT}`);
     });

@@ -111,7 +111,7 @@ const ListBooks = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>📚 Administration des livres</Text>
+            <Text style={styles.title}>Administration des livres</Text>
 
             <View style={styles.searchContainer}>
                 <View style={styles.searchBox}>

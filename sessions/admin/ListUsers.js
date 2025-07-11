@@ -101,7 +101,7 @@ const ListUsers = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>📋 Liste des utilisateurs</Text>
+            <Text style={styles.title}>Liste des utilisateurs</Text>
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* 🔍 Barre de recherche */}

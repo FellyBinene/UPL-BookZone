@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     try {
         connection.query(query, (error, results) => {
             if (error) {
-                console.error('[❌ SQL ERROR] Impossible de récupérer les administrateurs :', error);
+                console.error('[SQL ERROR] Impossible de récupérer les administrateurs :', error);
                 return res.status(500).json({ message: 'Erreur interne du serveur' });
             }
 
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
             res.status(200).json(results);
         });
     } catch (err) {
-        console.error('[❌ CATCH ERROR] Une exception est survenue :', err);
+        console.error('[CATCH ERROR] Une exception est survenue :', err);
         res.status(500).json({ message: 'Erreur critique côté serveur' });
     }
 });

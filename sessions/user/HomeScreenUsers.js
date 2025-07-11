@@ -6,7 +6,7 @@ import {
     StyleSheet,
     SafeAreaView,
 } from 'react-native';
-
+import { useNavigation } from '@react-navigation/native';
 import HeaderUsers from './components/HeaderUsers';
 import FooterUsers from './components/FooterUsers';
 import DisplayBook from './DisplayBook';
@@ -15,6 +15,7 @@ import UserProfile from './UserProfile';
 const { height, width } = Dimensions.get("window");
 
 const HomeScreenUsers = ({ route }) => {
+    const navigation = useNavigation();
     const userFromLogin = route?.params?.user || null; // extraire l'utilisateur de route params
 
     const [activeScreen, setActiveScreen] = useState('HomeUsers');
@@ -45,7 +46,9 @@ const HomeScreenUsers = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <HeaderUsers onRightPress={() => setActiveScreen('UserProfile')} />
+            <HeaderUsers
+                onLeftPress={() => navigation.navigate('Notifications')}
+                onRightPress={() => setActiveScreen('UserProfile')} />
             <View style={styles.content}>
                 {renderContent()}
             </View>

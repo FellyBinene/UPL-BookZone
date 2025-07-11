@@ -13,7 +13,7 @@ const Header = ({ onLeftPress, onRightPress }) => {
 
                 {/* Logo au centre */}
                 <Image
-                    source={require('../../../assets/images/svg/upl.png')} // adapte ce chemin selon ton projet
+                    source={require('../../../assets/images/svg/upl.png')}
                     style={styles.logo}
                     resizeMode="contain"
                 />

@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
 <div class="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6">
-    <h1 class="text-2xl font-bold text-indigo-700 mb-4 text-center">📘 Ajouter un Livre</h1>
+    <h1 class="text-2xl font-bold text-indigo-700 mb-4 text-center">Ajouter un Livre</h1>
 
     <form id="bookForm" class="space-y-4">
         <input type="text" id="titre" placeholder="Titre" class="w-full border px-4 py-2 rounded" required />
@@ -16,13 +16,13 @@
         <input type="text" id="genre" placeholder="Genre" class="w-full border px-4 py-2 rounded" required />
         <textarea id="resume" placeholder="Résumé" class="w-full border px-4 py-2 rounded" rows="4" required></textarea>
 
-        <label class="block font-semibold text-gray-700">🖼️ Image de couverture :</label>
+        <label class="block font-semibold text-gray-700">Image de couverture :</label>
         <input type="file" id="image_couverture" accept="image/*" class="w-full border px-4 py-2 rounded bg-gray-50" required />
 
-        <label class="block font-semibold text-gray-700">📄 Fichier (PDF/image/autre) :</label>
+        <label class="block font-semibold text-gray-700">Fichier (PDF/image/autre) :</label>
         <input type="file" id="fichier" accept="image/*,application/pdf" class="w-full border px-4 py-2 rounded bg-gray-50" required />
 
-        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">📤 Envoyer</button>
+        <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">Envoyer</button>
     </form>
 
     <div id="message" class="mt-4 text-center font-medium"></div>
@@ -44,7 +44,7 @@
         const image = document.getElementById('image_couverture').files[0];
 
         if (!titre || !auteur || !genre || !resume || !fichier || !image) {
-            message.textContent = "❌ Veuillez remplir tous les champs et ajouter les deux fichiers.";
+            message.textContent = "Veuillez remplir tous les champs et ajouter les deux fichiers.";
             message.className = "text-red-600";
             return;
         }
@@ -65,15 +65,15 @@
             const data = await res.json();
 
             if (data.success) {
-                message.textContent = "✅ Livre ajouté avec succès !";
+                message.textContent = "Livre ajouté avec succès !";
                 message.className = "text-green-600";
                 form.reset();
             } else {
-                message.textContent = "❌ " + (data.message || 'Erreur lors de l\'upload.');
+                message.textContent = "" + (data.message || 'Erreur lors de l\'upload.');
                 message.className = "text-red-600";
             }
         } catch (err) {
-            message.textContent = "❌ Erreur réseau ou serveur.";
+            message.textContent = "Erreur réseau ou serveur.";
             message.className = "text-red-600";
         }
     });
