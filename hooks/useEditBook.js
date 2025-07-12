@@ -4,7 +4,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-const API_URL = 'http://172.30.26.20:4000/api/books';
+const API_URL = 'http://192.168.101.89:4000/api/books';
 
 export default function useEditBook(selectedBook, loadBooks, closeModal) {
     const [editFields, setEditFields] = useState({ titre: '', auteur: '', genre: '', resume: '' });

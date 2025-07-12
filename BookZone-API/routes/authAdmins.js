@@ -1,9 +1,9 @@
-// routes/auth.js
+// routes/authAdmins.js
 const express = require('express');
 const router = express.Router();
-const connection = require('../db');
+const connection = require('../db'); // ta connexion MySQL
 
-// Route POST pour connecter un utilisateur
+// Route POST pour connecter un administrateur
 router.post('/signinAdmin', (req, res) => {
     const { matricule, password } = req.body;
 
@@ -20,7 +20,16 @@ router.post('/signinAdmin', (req, res) => {
         }
 
         if (results.length > 0) {
-            res.status(200).json({ message: 'Connexion réussie' });
+            const admin = results[0];
+            res.status(200).json({
+                message: 'Connexion réussie',
+                user: {
+                    fullName: admin.fullName,
+                    email: admin.email,
+                    phone: admin.phone,
+                    matricule: admin.matricule
+                }
+            });
         } else {
             res.status(401).json({ message: 'Matricule ou mot de passe incorrect' });
         }

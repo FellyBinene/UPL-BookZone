@@ -9,6 +9,7 @@ import {
     Linking,
     ActivityIndicator,
     Dimensions,
+    TextInput,
 } from 'react-native';
 import axios from 'axios';
 import * as Animatable from 'react-native-animatable';
@@ -20,12 +21,15 @@ const cardWidth = (screenWidth - spacing * (numColumns + 1)) / numColumns;
 
 const DisplayBook = () => {
     const [books, setBooks] = useState([]);
+    const [filteredBooks, setFilteredBooks] = useState([]);
+    const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(true);
 
     const fetchBooks = async () => {
         try {
             const response = await axios.get('http://192.168.101.89:4000/api/books');
             setBooks(response.data);
+            setFilteredBooks(response.data);
         } catch (error) {
             console.error('Erreur de chargement des livres:', error);
         } finally {
@@ -36,6 +40,16 @@ const DisplayBook = () => {
     useEffect(() => {
         fetchBooks();
     }, []);
+
+    const handleSearch = (text) => {
+        setSearchText(text);
+        const filtered = books.filter((book) =>
+            book.titre.toLowerCase().includes(text.toLowerCase()) ||
+            book.auteur.toLowerCase().includes(text.toLowerCase()) ||
+            book.genre.toLowerCase().includes(text.toLowerCase())
+        );
+        setFilteredBooks(filtered);
+    };
 
     const renderItem = ({ item, index }) => {
         const isImage = item.fichier_type?.startsWith('image');
@@ -70,24 +84,45 @@ const DisplayBook = () => {
     }
 
     return (
-        <FlatList
-            data={books}
-            keyExtractor={item => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={styles.container}
-            numColumns={numColumns}
-            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: spacing }}
-        />
+        <View style={{ flex: 1, backgroundColor: '#f3f4f6', width:350 }}>
+            <TextInput
+                style={styles.searchInput}
+                placeholder="Rechercher un livre, un auteur ou un genre..."
+                value={searchText}
+                onChangeText={handleSearch}
+                placeholderTextColor="#999"
+            />
+
+            <FlatList
+                data={filteredBooks}
+                keyExtractor={item => item.id.toString()}
+                renderItem={renderItem}
+                contentContainerStyle={styles.container}
+                numColumns={numColumns}
+                columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: spacing }}
+            />
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         padding: spacing,
-        backgroundColor: '#f3f4f6',
+        paddingBottom: 16,
+    },
+    searchInput: {
+        backgroundColor: '#fff',
+        margin: 10,
+        padding: 12,
+        borderRadius: 10,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        fontSize: 16,
+        color: '#000',
     },
     cardWrapper: {
         width: cardWidth,
+        minHeight: 260, // <- assure que chaque carte garde une hauteur cohérente
     },
     card: {
         backgroundColor: '#ffffff',
@@ -102,7 +137,7 @@ const styles = StyleSheet.create({
     },
     cover: {
         width: '100%',
-        height: 140,
+        height: 140, // fixe
         borderRadius: 10,
         marginBottom: 10,
     },

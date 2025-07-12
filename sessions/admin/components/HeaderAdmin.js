@@ -3,7 +3,7 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, SafeAreaView, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const Header = ({ onLeftPress, onRightPress }) => {
+const Header = ({ onLeftPress, onNavigate }) => {
     return (
         <SafeAreaView style={styles.wrapper}>
             <View style={styles.header}>
@@ -18,7 +18,7 @@ const Header = ({ onLeftPress, onRightPress }) => {
                     resizeMode="contain"
                 />
 
-                <TouchableOpacity onPress={onRightPress}>
+                <TouchableOpacity onPress={() => onNavigate('AdminProfile')}>
                     <Ionicons name="person-circle-outline" size={28} color="#000" />
                 </TouchableOpacity>
             </View>

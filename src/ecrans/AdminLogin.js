@@ -34,7 +34,8 @@ const AdminLogin = ({ navigation }) => {
                 Alert.alert('Succès', 'Connexion réussie !');
 
                 // Navigation vers la page Accueil avec les données utilisateur
-                navigation.navigate('Home', { user: utilisateur });
+                navigation.navigate('Home', { user: utilisateur }); // Vérifie bien que `utilisateur` contient les bons champs
+                console.log("ADMIN ENVOYÉ :", utilisateur);
             } else {
                 Alert.alert('Erreur', 'Connexion échouée');
             }

@@ -4,7 +4,7 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
+    SafeAreaView, Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import HeaderUsers from './components/HeaderUsers';
@@ -30,6 +30,11 @@ const HomeScreenUsers = ({ route }) => {
             default:
                 return (
                     <View style={styles.homeContent}>
+                        <Image
+                            source={require('../../assets/images/svg/undraw_real-time-collaboration_g4mc.png')}
+                            style={styles.headerImage}
+                            resizeMode="cover"
+                        />
                         <Text style={styles.title}>Bienvenue à UPL-BookZone</Text>
                     </View>
                 );
@@ -69,16 +74,25 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        backgroundColor: "#f3f4f6",
+        backgroundColor: "#fff",
         paddingHorizontal: 8,
         justifyContent: 'center',
         alignItems: 'center',
+
     },
     homeContent: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 16,
+        marginTop: -240,
+    },
+    headerImage: {
+        width: 340,           // pleine largeur de l'écran
+        height: 280,  // 25% de la hauteur écran
+        marginBottom: 20,
+        borderRadius : 20,
+
     },
     title: {
         fontSize: 25,

@@ -2,7 +2,7 @@
 import { Alert } from 'react-native';
 import axios from 'axios';
 
-const API_URL = 'http://172.30.26.20:4000/api/books';
+const API_URL = 'http://192.168.101.89:4000/api/books';
 
 export default function useDeleteBook(onDeleted) {
     const handleDelete = (id) => {

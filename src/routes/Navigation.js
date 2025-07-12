@@ -14,6 +14,7 @@ import HomeScreen from "../../sessions/admin/HomeScreen";
 import ListBooks from "@/sessions/admin/ListBooks";
 import HomeScreenUsers from "../../sessions/user/HomeScreenUsers";
 import UserProfile from '../../sessions/user/UserProfile';
+import AdminProfile from '../../sessions/admin/components/AdminProfile';
 import NotificationScreen from '../../sessions/user/NotificationScreen';
 
 const Navigation = () => {
@@ -37,6 +38,7 @@ const Navigation = () => {
                 <Stack.Screen name="HomeUsers" component={HomeScreenUsers} />
                 <Stack.Screen name="ListBooks" component={ListBooks} />
                 <Stack.Screen name="UserProfile" component={UserProfile} />
+                <Stack.Screen name="AdminProfile" component={AdminProfile} />
                 <Stack.Screen name="Notifications" component={NotificationScreen} />
             </Stack.Navigator>
         </NavigationContainer>

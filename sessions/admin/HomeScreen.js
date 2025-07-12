@@ -4,6 +4,7 @@ import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
 import Header from './components/HeaderAdmin';
 import Footer from './components/FooterAdmin';
+import AdminProfile from './components/AdminProfile'; // à importer en haut
 import ListUsers from "./ListUsers";
 import ListAdmins from "./ListAdmins";
 import ListBooks from "./ListBooks";
@@ -45,11 +46,14 @@ const UsersChoice = ({ onSelect }) => {
     );
 };
 
-const HomeScreen = () => {
+const HomeScreen = ({ route }) => {
+    const { user: admin } = route.params || {}; // récupère l'admin passé depuis la connexion
     const [activeScreen, setActiveScreen] = useState('Home');
 
     const renderContent = () => {
         switch (activeScreen) {
+            case 'AdminProfile':
+                return <AdminProfile admin={admin} />;
             case 'ListUsers':
                 return <ListUsers />;
             case 'ListAdmins':
@@ -78,7 +82,7 @@ const HomeScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header />
+            <Header onNavigate={handleNavigate}/>
             <View style={styles.content}>
                 {renderContent()}
             </View>
