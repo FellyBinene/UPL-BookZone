@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
     Alert,
 } from 'react-native';
 import { Entypo, Feather, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const TableHeader = () => (
     <View style={[styles.row, styles.header]}>
@@ -57,27 +58,35 @@ const UserRow = ({ user, index, onEdit, onDelete }) => (
 );
 
 const ListUsers = () => {
+    const navigation = useNavigation();
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
 
-    useEffect(() => {
-        fetch('http://192.168.101.89:4000/api/recup-users')
-            .then((res) => {
-                if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
-                return res.json();
-            })
-            .then((data) => {
-                setUsers(data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error('Erreur chargement :', err);
-                setError(err.message || 'Impossible de récupérer les utilisateurs.');
-                setLoading(false);
-            });
-    }, []);
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch('http://192.168.17.89:4000/api/recup-users');
+            if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
+            const data = await res.json();
+            setUsers(data);
+            setError(null);
+        } catch (err) {
+            console.error('Erreur chargement :', err);
+            setError(err.message || 'Impossible de récupérer les utilisateurs.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Rafraîchit les données quand on revient sur l’écran
+    useFocusEffect(
+        useCallback(() => {
+            fetchUsers();
+        }, [])
+    );
 
     const filteredUsers = users.filter(
         (u) =>
@@ -86,10 +95,36 @@ const ListUsers = () => {
             u.matricule.toLowerCase().includes(search.toLowerCase())
     );
 
-    // Callbacks simples à remplacer par ta logique
-    const handleAdd = () => Alert.alert('Ajouter', 'Fonction Ajouter à implémenter');
-    const handleEdit = (user) => Alert.alert('Modifier', `Modifier l’utilisateur ${user.fullName}`);
-    const handleDelete = (id) => Alert.alert('Supprimer', `Supprimer l’utilisateur ID ${id}?`);
+    const handleEdit = (user) => navigation.navigate('EditUser', { user });
+
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Confirmation",
+            "Voulez-vous vraiment supprimer cet utilisateur ?",
+            [
+                { text: "Annuler", style: "cancel" },
+                {
+                    text: "Supprimer", style: "destructive", onPress: async () => {
+                        try {
+                            const res = await fetch(`http://192.168.17.89:4000/api/users/${id}`, {
+                                method: 'DELETE',
+                            });
+
+                            if (res.ok) {
+                                Alert.alert("Succès", "Utilisateur supprimé.");
+                                fetchUsers(); // Rafraîchit après suppression
+                            } else {
+                                Alert.alert("Erreur", "Échec de la suppression.");
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            Alert.alert("Erreur", "Impossible de supprimer l'utilisateur.");
+                        }
+                    }
+                }
+            ]
+        );
+    };
 
     if (loading) {
         return (
@@ -104,14 +139,8 @@ const ListUsers = () => {
             <Text style={styles.title}>Liste des utilisateurs</Text>
             {error && <Text style={styles.errorText}>{error}</Text>}
 
-            {/* 🔍 Barre de recherche */}
             <View style={styles.searchBar}>
-                <Entypo
-                    name="magnifying-glass"
-                    size={20}
-                    color="#000"
-                    style={styles.icon}
-                />
+                <Entypo name="magnifying-glass" size={20} color="#000" style={styles.icon} />
                 <TextInput
                     placeholder="Rechercher (email, nom, matricule)..."
                     placeholderTextColor="#999"
@@ -121,9 +150,8 @@ const ListUsers = () => {
                 />
             </View>
 
-            {/* Bouton Ajouter */}
             <View style={styles.addBtnContainer}>
-                <TouchableOpacity style={styles.addBtn} onPress={handleAdd}>
+                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AddUsers')}>
                     <Feather name="plus-circle" size={28} color="#2563eb" />
                     <Text style={styles.addBtnText}>Ajouter</Text>
                 </TouchableOpacity>

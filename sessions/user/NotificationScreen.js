@@ -8,7 +8,7 @@ const NotificationScreen = () => {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                const res = await axios.get('http://192.168.101.89:4000/api/books/notifications');
+                const res = await axios.get('http://192.168.17.89:4000/api/books/notifications');
                 if (res.data.success) {
                     setBooks(res.data.notifications);
                 }

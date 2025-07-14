@@ -12,7 +12,7 @@ const HeaderUsers = ({ onRightPress }) => {
     useEffect(() => {
         const checkNotifications = async () => {
             try {
-                const res = await axios.get('http://192.168.101.89:4000/api/notifications');
+                const res = await axios.get('http://192.168.17.89:4000/api/notifications');
                 if (res.data.notifications && res.data.notifications.length > 0) {
                     setHasNotification(true);
                 } else {

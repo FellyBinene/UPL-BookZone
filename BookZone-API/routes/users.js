@@ -46,4 +46,53 @@ router.get('/users/:matricule', (req, res) => {
     });
 });
 
+
+// ✅ Route PUT - Modifier un utilisateur par ID
+router.put('/:id', (req, res) => {
+    const { id } = req.params;
+    const { email, fullName, phone, matricule } = req.body;
+
+    if (!email || !fullName || !phone || !matricule) {
+        return res.status(400).json({ message: 'Champs requis manquants' });
+    }
+
+    const query = `
+        UPDATE users 
+        SET email = ?, fullName = ?, phone = ?, matricule = ?
+        WHERE id = ?
+    `;
+
+    connection.query(query, [email, fullName, phone, matricule, id], (err, result) => {
+        if (err) {
+            console.error('Erreur lors de la mise à jour :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+
+        res.status(200).json({ message: 'Utilisateur mis à jour avec succès' });
+    });
+});
+
+// DELETE /api/users/:id
+router.delete('/:id', (req, res) => {
+    const userId = req.params.id;
+
+    const query = 'DELETE FROM users WHERE id = ?';
+    connection.query(query, [userId], (err, result) => {
+        if (err) {
+            console.error('Erreur lors de la suppression de l\'utilisateur :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+
+        res.json({ message: 'Utilisateur supprimé avec succès' });
+    });
+});
+
 module.exports = router;

@@ -27,7 +27,7 @@ const DisplayBook = () => {
 
     const fetchBooks = async () => {
         try {
-            const response = await axios.get('http://192.168.101.89:4000/api/books');
+            const response = await axios.get('http://192.168.17.89:4000/api/books');
             setBooks(response.data);
             setFilteredBooks(response.data);
         } catch (error) {
@@ -53,8 +53,8 @@ const DisplayBook = () => {
 
     const renderItem = ({ item, index }) => {
         const isImage = item.fichier_type?.startsWith('image');
-        const fileUrl = `http://192.168.101.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
-        const imageUrl = `http://192.168.101.89:4000/uploads/images/${item.image_nom}`;
+        const fileUrl = `http://192.168.17.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
+        const imageUrl = `http://192.168.17.89:4000/uploads/images/${item.image_nom}`;
 
         return (
             <Animatable.View

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -14,13 +14,14 @@ import {
     Dimensions,
     StyleSheet,
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
 
 import useDeleteBook from '../../hooks/useDeleteBook';
 import useEditBook from '../../hooks/useEditBook';
 import useSearchBooks from '../../hooks/useSearchBooks';
 
-const API_URL = 'http://192.168.101.89:4000/api/books';
+const API_URL = 'http://192.168.17.89:4000/api/books';
 
 const ListBooks = () => {
     const [books, setBooks] = useState([]);
@@ -43,6 +44,12 @@ const ListBooks = () => {
     useEffect(() => {
         loadBooks();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadBooks();
+        }, [])
+    );
 
     const { handleDelete } = useDeleteBook(loadBooks);
     const {
@@ -91,9 +98,9 @@ const ListBooks = () => {
             <Text style={styles.cell}>{item.auteur}</Text>
             <Text style={styles.cell}>{item.genre}</Text>
             <Text style={[styles.cell, { width: 180 }]} numberOfLines={2}>{item.resume}</Text>
-            <Image source={{ uri: `http://192.168.101.89:4000/uploads/images/${item.image_nom}` }} style={styles.image} />
+            <Image source={{ uri: `http://192.168.17.89:4000/uploads/images/${item.image_nom}` }} style={styles.image} />
             <TouchableOpacity
-                onPress={() => Linking.openURL(`http://192.168.101.89:4000/uploads/${item.fichier_type.startsWith('image') ? 'images' : 'files'}/${item.fichier_nom}`)}>
+                onPress={() => Linking.openURL(`http://192.168.17.89:4000/uploads/${item.fichier_type.startsWith('image') ? 'images' : 'files'}/${item.fichier_nom}`)}>
                 <Text style={styles.link}>Ouvrir</Text>
             </TouchableOpacity>
             <View style={styles.actions}>

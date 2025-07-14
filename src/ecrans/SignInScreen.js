@@ -54,7 +54,7 @@ const SignInScreen = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://172.30.26.20:4000/api/users', {
+                const response = await axios.post('http://192.168.17.89:4000/api/users', {
                     email,
                     fullName,
                     birthDate: birthDate.toISOString().split('T')[0],
@@ -129,7 +129,7 @@ const SignInScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.inputContainer}>
-                <Entypo name="phone" size={20} color="#666" style={{ marginRight: 5 }} />
+                <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
                     placeholder="Entrer votre matricule"

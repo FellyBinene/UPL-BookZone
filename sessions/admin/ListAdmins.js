@@ -12,6 +12,9 @@ import {
     Alert,
 } from 'react-native';
 import { Entypo, Feather, MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 const TableHeader = () => (
     <View style={[styles.row, styles.header]}>
@@ -44,13 +47,16 @@ const AdminRow = ({ user, index, onEdit, onDelete }) => (
 );
 
 const ListAdmins = () => {
+    const navigation = useNavigation();
+
     const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
 
-    useEffect(() => {
-        fetch('http://192.168.101.89:4000/api/recup-admins')
+    const loadAdmins = () => {
+        setLoading(true);
+        fetch('http://192.168.17.89:4000/api/recup-admins')
             .then((res) => {
                 if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
                 return res.json();
@@ -64,7 +70,13 @@ const ListAdmins = () => {
                 setError(err.message || 'Impossible de récupérer les administrateurs.');
                 setLoading(false);
             });
-    }, []);
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadAdmins(); // recharge quand on revient sur l'écran
+        }, [])
+    );
 
     const filteredAdmins = admins.filter((a) =>
         a.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -73,9 +85,40 @@ const ListAdmins = () => {
     );
 
     // Callbacks à compléter selon ta logique
-    const handleAdd = () => Alert.alert('Ajouter', 'Fonction Ajouter à implémenter');
-    const handleEdit = (user) => Alert.alert('Modifier', `Modifier l’utilisateur ${user.fullName}`);
-    const handleDelete = (id) => Alert.alert('Supprimer', `Supprimer l’utilisateur ID ${id}?`);
+    const handleEdit = (user) => {
+        navigation.navigate('EditAdmin', { user });
+    };
+
+    const handleDelete = (id) => {
+        Alert.alert(
+            'Confirmation',
+            'Voulez-vous vraiment supprimer cet administrateur ?',
+            [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                    text: 'Supprimer',
+                    style: 'destructive',
+                    onPress: () => {
+                        fetch(`http://192.168.17.89:4000/api/admins/${id}`, {
+                            method: 'DELETE',
+                        })
+                            .then((res) => {
+                                if (!res.ok) throw new Error('Erreur lors de la suppression');
+                                return res.json();
+                            })
+                            .then((data) => {
+                                Alert.alert('Succès', data.message);
+                                loadAdmins(); // Rafraîchir la liste
+                            })
+                            .catch((err) => {
+                                console.error('Erreur suppression :', err);
+                                Alert.alert('Erreur', err.message || 'Impossible de supprimer');
+                            });
+                    },
+                },
+            ]
+        );
+    };
 
     if (loading) {
         return (
@@ -104,7 +147,7 @@ const ListAdmins = () => {
 
             {/* Bouton Ajouter */}
             <View style={styles.addBtnContainer}>
-                <TouchableOpacity style={styles.addBtn} onPress={handleAdd}>
+                <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('InsAdmin')}>
                     <Feather name="plus-circle" size={28} color="#2563eb" />
                     <Text style={styles.addBtnText}>Ajouter</Text>
                 </TouchableOpacity>

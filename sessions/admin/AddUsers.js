@@ -4,8 +4,7 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    Platform,
-    Alert
+    Alert,
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
@@ -14,13 +13,38 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
 
-const AdminSignIn = ({ navigation }) => {
+const AddUsers = ({ navigation }) => {
     const [fullName, setFullName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [matricule, setMatricule] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [birthDate, setBirthDate] = useState(new Date());
+
+    const showDatePicker = () => {
+        Alert.alert(
+            "Information",
+            "Veuillez choisir votre date de naissance.",
+            [
+                {
+                    text: "Continuer",
+                    onPress: () => {
+                        DateTimePickerAndroid.open({
+                            value: birthDate,
+                            onChange: (event, selectedDate) => {
+                                if (selectedDate) {
+                                    setBirthDate(selectedDate);
+                                }
+                            },
+                            mode: 'date',
+                            is24Hour: true,
+                        });
+                    }
+                }
+            ]
+        );
+    };
 
     const handleSignUp = async () => {
         if (email && fullName && phone && matricule && password && confirmPassword) {
@@ -30,16 +54,17 @@ const AdminSignIn = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://192.168.17.89:4000/api/admins', {
+                const response = await axios.post('http://192.168.17.89:4000/api/users', {
                     email,
                     fullName,
                     phone,
                     matricule,
+                    birthDate: birthDate.toISOString().split('T')[0],
                     password,
                 });
 
                 if (response.status === 201) {
-                    Alert.alert('Succès', 'Inscription réussie');
+                    Alert.alert('Succès', 'Utilisateur ajouté avec succès');
                     navigation.navigate('Home');
                 }
             } catch (error) {
@@ -58,25 +83,33 @@ const AdminSignIn = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.root}>
             <View style={styles.inputContainer}>
-                <Entypo name={"add-user"} size={26} color="#000"  style={{ marginRight: 5 }}/>
-                <Text style={styles.title}>Ajout Admin</Text>
+                <Entypo name={"add-user"} size={26} color="#000"  style={{ marginRight:5 }}/>
+                <Text style={styles.title}>Ajout User</Text>
             </View>
 
             <View style={styles.inputContainer}>
                 <Entypo name="add-user" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Entrer votre nom complet"
+                    placeholder="Nom complet"
                     value={fullName}
                     onChangeText={setFullName}
                 />
             </View>
 
             <View style={styles.inputContainer}>
+                <Entypo name="calendar" size={20} color="#666" style={{ marginRight: 5 }} />
+                <TouchableOpacity onPress={showDatePicker} style={{ flex: 1 }}>
+                    <Text style={{ marginBottom: 5, color: '#555' }}>Date de naissance :</Text>
+                    <Text style={{ color: '#333' }}>{birthDate.toLocaleDateString()}</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputContainer}>
                 <Entypo name="phone" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Entrer votre contact"
+                    placeholder="Téléphone"
                     keyboardType="phone-pad"
                     value={phone}
                     onChangeText={setPhone}
@@ -87,7 +120,7 @@ const AdminSignIn = ({ navigation }) => {
                 <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Entrer votre email"
+                    placeholder="Email"
                     keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
@@ -98,8 +131,8 @@ const AdminSignIn = ({ navigation }) => {
                 <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Entrer votre matricule"
-                    keyboardType="phone-pad"
+                    placeholder="Matricule"
+                    keyboardType="numeric"
                     value={matricule}
                     onChangeText={setMatricule}
                 />
@@ -109,7 +142,7 @@ const AdminSignIn = ({ navigation }) => {
                 <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Entrer votre mot de passe"
+                    placeholder="Mot de passe"
                     secureTextEntry
                     value={password}
                     onChangeText={setPassword}
@@ -120,22 +153,21 @@ const AdminSignIn = ({ navigation }) => {
                 <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
-                    placeholder="Confirmer votre mot de passe"
+                    placeholder="Confirmer mot de passe"
                     secureTextEntry
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                 />
             </View>
 
-            <TouchableOpacity style={styles.touchableButton2} onPress={handleSignUp}>
-                <Text style={styles.textCenter}>M'inscrire</Text>
+            <TouchableOpacity style={styles.touchableButton1} onPress={handleSignUp}>
+                <Text style={styles.touchableText}>Ajouter</Text>
             </TouchableOpacity>
-
         </SafeAreaView>
     );
 };
 
-export default AdminSignIn;
+export default AddUsers;
 
 const styles = StyleSheet.create({
     root: {
@@ -145,12 +177,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     title: {
-        fontSize: 25,
-        fontWeight: '500',
+        fontSize: 26,
+        fontWeight: '600',
         color: '#333',
-        marginTop: 20,
-        marginBottom: 10,
-
+        marginBottom: 20,
 
     },
     inputContainer: {
@@ -159,32 +189,26 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
         paddingHorizontal: 8,
-        marginBottom: 25
+        marginBottom: 25,
     },
     input: {
         flex: 1,
+        fontSize: 16,
     },
     touchableButton1: {
-        marginBottom: 30,
-        borderRadius: 20,
-        padding: 20,
-        backgroundColor: '#0065ff',
+        backgroundColor: '#2563eb',
+        paddingVertical: 16,
+        borderRadius: 14,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 6,
     },
     touchableText: {
-        textAlign: 'center',
-        fontWeight: '700',
-        fontSize: 16,
         color: '#fff',
-    },
-    touchableButton2: {
-        marginBottom: 30,
-        borderRadius: 20,
-        padding: 20,
-        backgroundColor: '#fffb00',
-    },
-    textCenter: {
         textAlign: 'center',
-        fontWeight: '700',
+        fontWeight: 'bold',
         fontSize: 16,
-    }
+    },
 });

@@ -16,6 +16,10 @@ import HomeScreenUsers from "../../sessions/user/HomeScreenUsers";
 import UserProfile from '../../sessions/user/UserProfile';
 import AdminProfile from '../../sessions/admin/components/AdminProfile';
 import NotificationScreen from '../../sessions/user/NotificationScreen';
+import ListAdmins from "../../sessions/admin/ListAdmins";
+import EditAdmin from "../../sessions/admin/EditAdmin";
+import AddUsers from "../../sessions/admin/AddUsers";
+import EditUser from "../../sessions/admin/EditUser";
 
 const Navigation = () => {
     const Stack = createNativeStackNavigator();
@@ -40,6 +44,11 @@ const Navigation = () => {
                 <Stack.Screen name="UserProfile" component={UserProfile} />
                 <Stack.Screen name="AdminProfile" component={AdminProfile} />
                 <Stack.Screen name="Notifications" component={NotificationScreen} />
+                <Stack.Screen name="ListAdmins" component={ListAdmins} />
+                <Stack.Screen name="EditAdmin" component={EditAdmin} />
+                <Stack.Screen name="AddUsers" component={AddUsers} />
+                <Stack.Screen name="EditUser" component={EditUser} />
+
             </Stack.Navigator>
         </NavigationContainer>
     );
