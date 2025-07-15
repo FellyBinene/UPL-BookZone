@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const UserProfile = ({ user }) => {
+const UserProfile = ({ user, onLogout, onChangePassword }) => {
     if (!user) {
         return (
             <View style={styles.container}>
@@ -19,21 +19,23 @@ const UserProfile = ({ user }) => {
             </View>
 
             <View style={styles.profileBox}>
-                <Text style={styles.info}>
-                    <Text style={styles.label}>Nom :</Text> {user.fullName}
-                </Text>
-                <Text style={styles.info}>
-                    <Text style={styles.label}>Email :</Text> {user.email}
-                </Text>
-                <Text style={styles.info}>
-                    <Text style={styles.label}>Téléphone :</Text> {user.phone}
-                </Text>
-                <Text style={styles.info}>
-                    <Text style={styles.label}>Date de naissance :</Text> {user.birthDate}
-                </Text>
-                <Text style={styles.info}>
-                    <Text style={styles.label}>Matricule :</Text> {user.matricule}
-                </Text>
+                <Text style={styles.info}><Text style={styles.label}>Nom :</Text> {user.fullName}</Text>
+                <Text style={styles.info}><Text style={styles.label}>Email :</Text> {user.email}</Text>
+                <Text style={styles.info}><Text style={styles.label}>Téléphone :</Text> {user.phone}</Text>
+                <Text style={styles.info}><Text style={styles.label}>Date de naissance :</Text> {user.birthDate}</Text>
+                <Text style={styles.info}><Text style={styles.label}>Matricule :</Text> {user.matricule}</Text>
+            </View>
+
+            <View style={styles.buttonGroup}>
+                <TouchableOpacity style={styles.btn} onPress={onChangePassword}>
+                    <Ionicons name="lock-closed-outline" size={20} color="#2563eb" />
+                    <Text style={styles.btnText}>Modifier mot de passe</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.btn, styles.logoutBtn]} onPress={onLogout}>
+                    <Ionicons name="exit-outline" size={20} color="#dc2626" />
+                    <Text style={[styles.btnText, { color: '#dc2626' }]}>Déconnexion</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -80,6 +82,28 @@ const styles = StyleSheet.create({
         color: '#dc2626',
         textAlign: 'center',
         marginTop: 50,
+    },
+    buttonGroup: {
+        marginTop: 30,
+        width: '100%',
+        gap: 12,
+    },
+    btn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#e0e7ff',
+        padding: 12,
+        borderRadius: 10,
+        justifyContent: 'center',
+    },
+    logoutBtn: {
+        backgroundColor: '#fee2e2',
+    },
+    btnText: {
+        marginLeft: 10,
+        fontSize: 16,
+        color: '#2563eb',
+        fontWeight: '600',
     },
 });
 

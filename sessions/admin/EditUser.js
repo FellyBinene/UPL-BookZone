@@ -10,6 +10,7 @@ const EditUser = ({ route, navigation }) => {
     const [email, setEmail] = useState(user.email);
     const [phone, setPhone] = useState(user.phone);
     const [matricule, setMatricule] = useState(user.matricule);
+    const [password, setPassword] = useState(user.password || '');
 
     const handleUpdate = async () => {
         try {
@@ -18,6 +19,7 @@ const EditUser = ({ route, navigation }) => {
                 email,
                 phone,
                 matricule,
+                password,
             });
 
             if (response.status === 200) {
@@ -40,6 +42,13 @@ const EditUser = ({ route, navigation }) => {
             <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
             <TextInput style={styles.input} placeholder="Téléphone" value={phone} onChangeText={setPhone} />
             <TextInput style={styles.input} placeholder="Matricule" value={matricule} onChangeText={setMatricule} />
+            <TextInput
+                style={styles.input}
+                placeholder="Mot de passe"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={true}  // masque le texte
+            />
 
             <TouchableOpacity style={styles.button} onPress={handleUpdate}>
                 <Text style={styles.buttonText}>Mettre à jour</Text>

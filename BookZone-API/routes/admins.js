@@ -76,4 +76,34 @@ router.delete('/:id', (req, res) => {
     });
 });
 
+router.put('/password/:matricule', async (req, res) => {
+    const { matricule } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    // Cherche l'admin dans la DB
+    connection.query(
+        'SELECT * FROM admins WHERE matricule = ?',
+        [matricule],
+        (err, results) => {
+            if (err) return res.status(500).json({ message: "Erreur serveur" });
+            if (results.length === 0) return res.status(404).json({ message: "Admin non trouvé" });
+
+            const admin = results[0];
+            if (admin.password !== currentPassword) {
+                return res.status(400).json({ message: "Mot de passe actuel incorrect" });
+            }
+
+            // Mise à jour
+            connection.query(
+                'UPDATE admins SET password = ? WHERE matricule = ?',
+                [newPassword, matricule],
+                (err2) => {
+                    if (err2) return res.status(500).json({ message: "Erreur serveur lors de la mise à jour" });
+                    return res.json({ message: "Mot de passe mis à jour avec succès" });
+                }
+            );
+        }
+    );
+});
+
 module.exports = router;

@@ -16,7 +16,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const TableHeader = () => (
     <View style={[styles.row, styles.header]}>
-        {['ID', 'Email', 'Full Name', 'Birth Date', 'Phone', 'Matricule', 'Created At', 'Actions'].map((title) => (
+        {['ID', 'Email', 'Full Name', 'Birth Date', 'Phone', 'Matricule', 'Password', 'Created At', 'Actions'].map((title) => (
             <Text
                 key={title}
                 style={[
@@ -44,6 +44,7 @@ const UserRow = ({ user, index, onEdit, onDelete }) => (
         <Text style={styles.cell}>{user.birthDate}</Text>
         <Text style={styles.cell}>{user.phone}</Text>
         <Text style={styles.cell}>{user.matricule}</Text>
+        <Text style={styles.cell}>{user.password}</Text>
         <Text style={styles.cell}>{user.created_at}</Text>
 
         <View style={[styles.cell, styles.actionsCell]}>

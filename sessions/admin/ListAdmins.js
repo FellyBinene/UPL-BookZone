@@ -18,7 +18,7 @@ import { useCallback } from 'react';
 
 const TableHeader = () => (
     <View style={[styles.row, styles.header]}>
-        {['ID', 'Email', 'Full Name', 'Phone', 'Matricule', 'Created At', 'Actions'].map((title) => (
+        {['ID', 'Email', 'Full Name', 'Phone', 'Matricule', 'Password', 'Created At', 'Actions'].map((title) => (
             <Text key={title} style={[styles.cell, styles.bold, title === 'Actions' && { width: 120 }]}>
                 {title}
             </Text>
@@ -33,6 +33,7 @@ const AdminRow = ({ user, index, onEdit, onDelete }) => (
         <Text style={styles.cell}>{user.fullName}</Text>
         <Text style={styles.cell}>{user.phone}</Text>
         <Text style={styles.cell}>{user.matricule}</Text>
+        <Text style={styles.cell}>{user.password}</Text>
         <Text style={styles.cell}>{user.created_at}</Text>
 
         <View style={[styles.cell, styles.actionsCell]}>

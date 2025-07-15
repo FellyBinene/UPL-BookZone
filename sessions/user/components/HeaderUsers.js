@@ -1,36 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, TouchableOpacity, SafeAreaView, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Entypo } from '@expo/vector-icons';
+import { Ionicons, Entypo } from '@expo/vector-icons';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const HeaderUsers = ({ onRightPress }) => {
     const navigation = useNavigation();
     const [hasNotification, setHasNotification] = useState(false);
 
-    useEffect(() => {
-        const checkNotifications = async () => {
-            try {
-                const res = await axios.get('http://192.168.17.89:4000/api/notifications');
-                if (res.data.notifications && res.data.notifications.length > 0) {
-                    setHasNotification(true);
-                } else {
-                    setHasNotification(false);
-                }
-            } catch (err) {
-                console.error('Erreur notification :', err);
-            }
-        };
-
-        checkNotifications();
-        const interval = setInterval(checkNotifications, 60000);
-        return () => clearInterval(interval);
+    const checkNotifications = useCallback(async () => {
+        try {
+            const res = await axios.get('http://192.168.17.89:4000/api/notifications');
+            setHasNotification(res.data.notifications && res.data.notifications.length > 0);
+        } catch (err) {
+            console.error('Erreur notification :', err);
+        }
     }, []);
 
+    useFocusEffect(
+        useCallback(() => {
+            checkNotifications();
+            const interval = setInterval(checkNotifications, 60000);
+            return () => clearInterval(interval);
+        }, [checkNotifications])
+    );
+
     const handleBellPress = () => {
-        setHasNotification(false); // ✅ on enlève la bulle rouge
-        navigation.navigate('Notifications'); // ✅ on redirige
+        setHasNotification(false);
+        navigation.navigate('Notifications');
     };
 
     return (
@@ -77,13 +74,15 @@ const styles = StyleSheet.create({
         height: 40,
     },
     badge: {
-        width: 10,
-        height: 10,
+        width: 12,
+        height: 12,
         backgroundColor: 'red',
-        borderRadius: 5,
+        borderRadius: 6,
         position: 'absolute',
         top: -4,
         right: -4,
+        borderWidth: 1.5,
+        borderColor: 'white',
     },
 });
 

@@ -17,6 +17,7 @@ const EditAdmin = ({ route, navigation }) => {
     const [phone, setPhone] = useState(user.phone);
     const [matricule, setMatricule] = useState(user.matricule);
     const [loading, setLoading] = useState(false);
+    const [password, setPassword] = useState(user.password || '');
 
     const handleUpdate = () => {
         if (!email || !fullName || !phone || !matricule) {
@@ -36,6 +37,7 @@ const EditAdmin = ({ route, navigation }) => {
                 email,
                 phone,
                 matricule,
+                password,
             }),
         })
             .then(response => {
@@ -87,6 +89,13 @@ const EditAdmin = ({ route, navigation }) => {
                 onChangeText={setMatricule}
                 placeholder="Matricule"
                 keyboardType="number-pad"
+                style={styles.input}
+            />
+            <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Mot de passe"
+                secureTextEntry={true}
                 style={styles.input}
             />
 

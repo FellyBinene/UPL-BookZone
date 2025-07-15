@@ -95,4 +95,42 @@ router.delete('/:id', (req, res) => {
     });
 });
 
+// PUT - Modifier le mot de passe d’un utilisateur
+router.put('/password/:matricule', (req, res) => {
+    const { matricule } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'Champs requis manquants' });
+    }
+
+    const selectQuery = 'SELECT * FROM users WHERE matricule = ?';
+    connection.query(selectQuery, [matricule], (err, results) => {
+        if (err) {
+            console.error('Erreur lors de la recherche de l’utilisateur :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
+        }
+
+        const user = results[0];
+
+        if (user.password !== currentPassword) {
+            return res.status(400).json({ message: 'Mot de passe actuel incorrect' });
+        }
+
+        const updateQuery = 'UPDATE users SET password = ? WHERE matricule = ?';
+        connection.query(updateQuery, [newPassword, matricule], (updateErr) => {
+            if (updateErr) {
+                console.error('Erreur lors de la mise à jour du mot de passe :', updateErr);
+                return res.status(500).json({ message: 'Erreur lors de la mise à jour' });
+            }
+
+            return res.json({ message: 'Mot de passe mis à jour avec succès' });
+        });
+    });
+});
+
 module.exports = router;

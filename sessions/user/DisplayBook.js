@@ -14,16 +14,41 @@ import {
 import axios from 'axios';
 import * as Animatable from 'react-native-animatable';
 
-const numColumns = 2;
-const screenWidth = Dimensions.get('window').width;
 const spacing = 8;
-const cardWidth = (screenWidth - spacing * (numColumns + 1)) / numColumns;
 
 const DisplayBook = () => {
     const [books, setBooks] = useState([]);
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(true);
+
+    // Dimensions & responsive cols state
+    const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+    const [numColumns, setNumColumns] = useState(2);
+    const [cardWidth, setCardWidth] = useState(0);
+
+    // Fonction pour ajuster numColumns et cardWidth selon largeur écran
+    const adjustLayout = (width) => {
+        let columns = 2;
+        if (width >= 900) columns = 4;
+        else if (width >= 600) columns = 3;
+        else columns = 2;
+
+        const cWidth = (width - spacing * (columns + 1)) / columns;
+        setNumColumns(columns);
+        setCardWidth(cWidth);
+    };
+
+    useEffect(() => {
+        adjustLayout(screenWidth);
+
+        const subscription = Dimensions.addEventListener('change', ({ window }) => {
+            setScreenWidth(window.width);
+            adjustLayout(window.width);
+        });
+
+        return () => subscription?.remove();
+    }, []);
 
     const fetchBooks = async () => {
         try {
@@ -62,7 +87,7 @@ const DisplayBook = () => {
                 delay={index * 100}
                 duration={500}
                 useNativeDriver
-                style={styles.cardWrapper}
+                style={[styles.cardWrapper, { width: cardWidth }]}  // width dynamique ici
             >
                 <TouchableOpacity onPress={() => Linking.openURL(fileUrl)} activeOpacity={0.9} style={styles.card}>
                     <Image source={{ uri: imageUrl }} style={styles.cover} />
@@ -84,7 +109,7 @@ const DisplayBook = () => {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#f3f4f6', width:350 }}>
+        <View style={{ flex: 1, backgroundColor: '#f3f4f6' }}>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Rechercher un livre, un auteur ou un genre..."
@@ -97,6 +122,7 @@ const DisplayBook = () => {
                 data={filteredBooks}
                 keyExtractor={item => item.id.toString()}
                 renderItem={renderItem}
+                style={{ flex: 1 }}  // <-- important
                 contentContainerStyle={styles.container}
                 numColumns={numColumns}
                 columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: spacing }}
@@ -121,8 +147,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     cardWrapper: {
-        width: cardWidth,
-        minHeight: 260, // <- assure que chaque carte garde une hauteur cohérente
+        minHeight: 260, // hauteur fixe pour uniformité
     },
     card: {
         backgroundColor: '#ffffff',
@@ -133,11 +158,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 4 },
-        margin: 5
+        margin: 5,
     },
     cover: {
         width: '100%',
-        height: 140, // fixe
+        height: 140,
         borderRadius: 10,
         marginBottom: 10,
     },

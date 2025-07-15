@@ -6,6 +6,7 @@ import {
     StyleSheet,
     SafeAreaView, Image,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import HeaderUsers from './components/HeaderUsers';
 import FooterUsers from './components/FooterUsers';
@@ -21,12 +22,24 @@ const HomeScreenUsers = ({ route }) => {
     const [activeScreen, setActiveScreen] = useState('HomeUsers');
     const [user, setUser] = useState(userFromLogin);
 
+    const handleLogout = async () => {
+        await AsyncStorage.removeItem('user');
+        setUser(null);
+        navigation.replace('Connexion');
+    };
+
     const renderContent = () => {
         switch (activeScreen) {
             case 'DisplayBook':
                 return <DisplayBook />;
             case 'UserProfile':
-                return <UserProfile user={user} />;  // On passe bien l'utilisateur ici
+                return (
+                    <UserProfile
+                        user={user}
+                        onLogout={handleLogout}
+                        onChangePassword={() => navigation.navigate('ChangePassword', { matricule: user.matricule })}
+                    />
+                );
             default:
                 return (
                     <View style={styles.homeContent}>

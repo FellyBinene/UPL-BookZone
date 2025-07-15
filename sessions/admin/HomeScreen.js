@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Dimensions, View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 import Header from './components/HeaderAdmin';
 import Footer from './components/FooterAdmin';
@@ -47,6 +48,7 @@ const UsersChoice = ({ onSelect }) => {
 };
 
 const HomeScreen = ({ route }) => {
+    const navigation = useNavigation();
     const { user: admin } = route.params || {}; // récupère l'admin passé depuis la connexion
     const [activeScreen, setActiveScreen] = useState('Home');
 
@@ -82,7 +84,15 @@ const HomeScreen = ({ route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header onNavigate={handleNavigate}/>
+            <Header
+                onNavigate={handleNavigate}
+                onChangePassword={() => {
+                    navigation.navigate('ChangePasswordAdmin', { matricule: admin?.matricule });
+                }}
+                onLogout={() => {
+                    navigation.replace('ConAdmin');
+                }}
+            />
             <View style={styles.content}>
                 {renderContent()}
             </View>
