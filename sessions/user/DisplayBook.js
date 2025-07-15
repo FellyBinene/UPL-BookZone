@@ -11,12 +11,15 @@ import {
     Dimensions,
     TextInput,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import * as Animatable from 'react-native-animatable';
 
 const spacing = 8;
 
 const DisplayBook = () => {
+    const navigation = useNavigation();
+
     const [books, setBooks] = useState([]);
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [searchText, setSearchText] = useState('');
@@ -89,7 +92,7 @@ const DisplayBook = () => {
                 useNativeDriver
                 style={[styles.cardWrapper, { width: cardWidth }]}  // width dynamique ici
             >
-                <TouchableOpacity onPress={() => Linking.openURL(fileUrl)} activeOpacity={0.9} style={styles.card}>
+                <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { book: item })} activeOpacity={0.9} style={styles.card}>
                     <Image source={{ uri: imageUrl }} style={styles.cover} />
                     <Text style={styles.title}>{item.titre}</Text>
                     <Text><Text style={styles.label}>Auteur :</Text> {item.auteur}</Text>
@@ -109,7 +112,7 @@ const DisplayBook = () => {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#f3f4f6' }}>
+        <View style={{ flex: 1, backgroundColor: '#f3f4f6', width: '100%' }}>
             <TextInput
                 style={styles.searchInput}
                 placeholder="Rechercher un livre, un auteur ou un genre..."

@@ -11,7 +11,19 @@ router.use((req, res, next) => {
 
 // ✅ Route GET pour récupérer tous les utilisateurs
 router.get('/', async (req, res) => {
-    const query = 'SELECT * FROM users ORDER BY created_at DESC'; // 🔁 tri du plus récent au plus ancien
+    const query = `
+        SELECT 
+            id,
+            email,
+            fullName,
+            birthDate,
+            phone,
+            matricule,
+            password,
+            created_at
+        FROM users
+        ORDER BY created_at DESC
+    `;
 
     try {
         connection.query(query, (error, results) => {
@@ -24,13 +36,27 @@ router.get('/', async (req, res) => {
                 return res.status(404).json({ message: 'Aucun utilisateur trouvé' });
             }
 
-            // ✅ Réponse réussie
             res.status(200).json(results);
         });
     } catch (err) {
         console.error('[CATCH ERROR] Une exception est survenue :', err);
         res.status(500).json({ message: 'Erreur critique côté serveur' });
     }
+});
+
+router.get('/recup-users', (req, res) => {
+    const query = `
+    SELECT id, email, fullName, birthDate, phone, matricule, password, created_at
+    FROM users
+    ORDER BY created_at DESC
+  `;
+
+    connection.query(query, (error, results) => {
+        if (error) {
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+        res.json(results);
+    });
 });
 
 module.exports = router;

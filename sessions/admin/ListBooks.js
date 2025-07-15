@@ -118,7 +118,7 @@ const ListBooks = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Administration des livres</Text>
+            <Text style={styles.title}>Gestion livres</Text>
 
             <View style={styles.searchContainer}>
                 <View style={styles.searchBox}>
@@ -156,27 +156,68 @@ const ListBooks = () => {
             )}
 
             <Modal visible={modalVisible} animationType="slide">
-                <ScrollView style={{ padding: 20 }}>
+                <ScrollView style={styles.modalWrapper} contentContainerStyle={{ paddingBottom: 40 }}>
                     <Text style={styles.modalTitle}>Modifier le livre</Text>
-                    {["titre", "auteur", "genre", "resume"].map((field) => (
+
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Titre</Text>
                         <TextInput
-                            key={field}
-                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                            value={editFields[field]}
-                            onChangeText={(text) => setEditFields({ ...editFields, [field]: text })}
+                            placeholder="Titre du livre"
+                            value={editFields.titre}
+                            onChangeText={(text) => setEditFields({ ...editFields, titre: text })}
                             style={styles.modalInput}
                         />
-                    ))}
+                    </View>
 
-                    <Button title="Choisir une nouvelle image" onPress={pickImage} />
-                    <View style={{ height: 10 }} />
-                    <Button title="Choisir un nouveau fichier" onPress={pickFile} />
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Auteur</Text>
+                        <TextInput
+                            placeholder="Nom de l'auteur"
+                            value={editFields.auteur}
+                            onChangeText={(text) => setEditFields({ ...editFields, auteur: text })}
+                            style={styles.modalInput}
+                        />
+                    </View>
+
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Genre</Text>
+                        <TextInput
+                            placeholder="Genre du livre"
+                            value={editFields.genre}
+                            onChangeText={(text) => setEditFields({ ...editFields, genre: text })}
+                            style={styles.modalInput}
+                        />
+                    </View>
+
+                    <View style={styles.formGroup}>
+                        <Text style={styles.label}>Résumé</Text>
+                        <TextInput
+                            placeholder="Résumé du livre"
+                            value={editFields.resume}
+                            onChangeText={(text) => setEditFields({ ...editFields, resume: text })}
+                            style={[styles.modalInput, { height: 100, textAlignVertical: 'top' }]}
+                            multiline
+                        />
+                    </View>
+
+                    <View style={styles.formGroup}>
+                        <Button title="Choisir une nouvelle image" onPress={pickImage} color="#4f46e5" />
+                    </View>
+
+                    <View style={styles.formGroup}>
+                        <Button title="Choisir un nouveau fichier" onPress={pickFile} color="#4f46e5" />
+                    </View>
 
                     <View style={styles.modalActions}>
-                        <Button title="Annuler" onPress={() => setModalVisible(false)} />
-                        <Button title="Enregistrer" onPress={submitEdit} color="#4f46e5" />
+                        <TouchableOpacity style={styles.cancelBtn} onPress={() => setModalVisible(false)}>
+                            <Text style={styles.cancelText}>Annuler</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.saveBtn} onPress={submitEdit}>
+                            <Text style={styles.saveText}>Enregistrer</Text>
+                        </TouchableOpacity>
                     </View>
-                    <Text style={{ textAlign: 'center', marginTop: 10 }}>{message}</Text>
+
+                    {message ? <Text style={styles.feedback}>{message}</Text> : null}
                 </ScrollView>
             </Modal>
         </View>
@@ -317,6 +358,55 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 20,
+    },
+    modalWrapper: {
+        padding: 20,
+        backgroundColor: '#f9fafb',
+    },
+
+    formGroup: {
+        marginBottom: 16,
+    },
+
+    label: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginBottom: 6,
+        color: '#374151',
+    },
+
+    cancelBtn: {
+        backgroundColor: '#e5e7eb',
+        padding: 12,
+        borderRadius: 10,
+        flex: 1,
+        marginRight: 10,
+        alignItems: 'center',
+    },
+
+    cancelText: {
+        color: '#1f2937',
+        fontWeight: 'bold',
+    },
+
+    saveBtn: {
+        backgroundColor: '#4f46e5',
+        padding: 12,
+        borderRadius: 10,
+        flex: 1,
+        alignItems: 'center',
+    },
+
+    saveText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+
+    feedback: {
+        textAlign: 'center',
+        color: '#10b981',
+        marginTop: 15,
+        fontWeight: '600',
     },
 });
 

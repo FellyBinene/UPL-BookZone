@@ -7,6 +7,7 @@ import {
     StyleSheet,
     ActivityIndicator,
     Alert,
+    TouchableOpacity,
 } from 'react-native';
 
 const EditAdmin = ({ route, navigation }) => {
@@ -64,45 +65,66 @@ const EditAdmin = ({ route, navigation }) => {
         <View style={styles.container}>
             <Text style={styles.title}>Modifier Administrateur</Text>
 
-            <TextInput
-                value={fullName}
-                onChangeText={setFullName}
-                placeholder="Nom complet"
-                style={styles.input}
-            />
-            <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Email"
-                keyboardType="email-address"
-                style={styles.input}
-            />
-            <TextInput
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="Téléphone"
-                keyboardType="phone-pad"
-                style={styles.input}
-            />
-            <TextInput
-                value={matricule}
-                onChangeText={setMatricule}
-                placeholder="Matricule"
-                keyboardType="number-pad"
-                style={styles.input}
-            />
-            <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Mot de passe"
-                secureTextEntry={true}
-                style={styles.input}
-            />
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>Nom complet</Text>
+                <TextInput
+                    value={fullName}
+                    onChangeText={setFullName}
+                    placeholder="Nom complet"
+                    style={styles.input}
+                />
+            </View>
+
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Adresse e-mail"
+                    keyboardType="email-address"
+                    style={styles.input}
+                />
+            </View>
+
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>Téléphone</Text>
+                <TextInput
+                    value={phone}
+                    onChangeText={setPhone}
+                    placeholder="Téléphone"
+                    keyboardType="phone-pad"
+                    style={styles.input}
+                />
+            </View>
+
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>Matricule</Text>
+                <TextInput
+                    value={matricule}
+                    onChangeText={setMatricule}
+                    placeholder="Matricule"
+                    keyboardType="number-pad"
+                    style={styles.input}
+                />
+            </View>
+
+            <View style={styles.formGroup}>
+                <Text style={styles.label}>Mot de passe</Text>
+                <TextInput
+                    value={password}
+                    onChangeText={setPassword}
+                    placeholder="Mot de passe"
+                    secureTextEntry
+                    style={styles.input}
+                />
+            </View>
 
             {loading ? (
                 <ActivityIndicator size="large" color="#2563eb" style={{ marginTop: 20 }} />
             ) : (
-                <Button title="Mettre à jour" onPress={handleUpdate} color="#2563eb" />
+                <TouchableOpacity style={styles.saveBtn} onPress={handleUpdate}>
+                    <Text style={styles.saveText}>Mettre à jour</Text>
+                </TouchableOpacity>
             )}
         </View>
     );
@@ -111,25 +133,59 @@ const EditAdmin = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#ffffff',
+        padding: 24,
+        backgroundColor: '#f3f4f6', // fond gris clair
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 30,
         textAlign: 'center',
         color: '#1f2937',
     },
+    formGroup: {
+        marginBottom: 18,
+        backgroundColor: '#ffffff',
+        padding: 14,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    label: {
+        fontSize: 15,
+        fontWeight: '600',
+        marginBottom: 6,
+        color: '#374151',
+    },
     input: {
         borderWidth: 1,
-        borderColor: '#cbd5e1',
+        borderColor: '#d1d5db',
         borderRadius: 8,
-        marginBottom: 15,
         paddingHorizontal: 12,
         paddingVertical: 10,
-        fontSize: 16,
+        fontSize: 15,
         backgroundColor: '#f9fafb',
+        color: '#111827',
+    },
+    saveBtn: {
+        backgroundColor: '#2563eb',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginTop: 25,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    saveText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

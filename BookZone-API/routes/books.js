@@ -15,4 +15,18 @@ router.get('/notifications', (req, res) => {
     });
 });
 
+// ✅ Route GET - Liste de tous les livres
+router.get('/', (req, res) => {
+    const query = 'SELECT * FROM books';
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Erreur lors de la récupération des livres :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+
+        res.json(results);
+    });
+});
+
 module.exports = router;

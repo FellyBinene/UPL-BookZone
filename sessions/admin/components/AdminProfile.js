@@ -41,13 +41,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f3f4f6',
-        padding: 75,
-        // Important : étirer horizontalement pour remplir la largeur
-        alignItems: 'stretch',
-    },
-    centerContent: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 40,          // espace en haut pour coller en haut sans être collé à l’écran
+        alignItems: 'center',    // centre horizontalement
     },
     header: {
         alignItems: 'center',
@@ -61,10 +57,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     profileBox: {
-        width: 300,
+        width: '90%',
+        maxWidth: 400,
         backgroundColor: '#fff',
         borderRadius: 12,
-        padding: 50,
+        padding: 20,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 6,
@@ -78,7 +75,7 @@ const styles = StyleSheet.create({
     label: {
         fontWeight: 'bold',
         color: '#4b5563',
-        fontSize : 20
+        fontSize: 20,
     },
     error: {
         fontSize: 18,

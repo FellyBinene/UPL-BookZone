@@ -50,19 +50,19 @@ router.get('/users/:matricule', (req, res) => {
 // ✅ Route PUT - Modifier un utilisateur par ID
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { email, fullName, phone, matricule } = req.body;
+    const { email, fullName, birthDate, phone, matricule } = req.body;
 
-    if (!email || !fullName || !phone || !matricule) {
+    if (!email || !fullName || !birthDate || !phone || !matricule) {
         return res.status(400).json({ message: 'Champs requis manquants' });
     }
 
     const query = `
         UPDATE users 
-        SET email = ?, fullName = ?, phone = ?, matricule = ?
+        SET email = ?, fullName = ?, birthDate = ?, phone = ?, matricule = ?
         WHERE id = ?
     `;
 
-    connection.query(query, [email, fullName, phone, matricule, id], (err, result) => {
+    connection.query(query, [email, fullName, birthDate, phone, matricule, id], (err, result) => {
         if (err) {
             console.error('Erreur lors de la mise à jour :', err);
             return res.status(500).json({ message: 'Erreur serveur' });
@@ -130,6 +130,20 @@ router.put('/password/:matricule', (req, res) => {
 
             return res.json({ message: 'Mot de passe mis à jour avec succès' });
         });
+    });
+});
+
+// ✅ Route GET - Liste de tous les utilisateurs
+router.get('/', (req, res) => {
+    const query = 'SELECT * FROM users';
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error('Erreur lors de la récupération des utilisateurs :', err);
+            return res.status(500).json({ message: 'Erreur serveur' });
+        }
+
+        res.json(results);
     });
 });
 

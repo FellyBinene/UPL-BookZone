@@ -22,7 +22,7 @@ import AddUsers from "../../sessions/admin/AddUsers";
 import EditUser from "../../sessions/admin/EditUser";
 import ChangePasswordScreen from "../../sessions/user/components/ChangePasswordScreen";
 import ChangePasswordAdmin from "../../sessions/admin/components/ChangePasswordAdmin";
-
+import BookDetail from "../../sessions/user/BookDetail";
 const Navigation = () => {
     const Stack = createNativeStackNavigator();
 
@@ -52,6 +52,7 @@ const Navigation = () => {
                 <Stack.Screen name="EditUser" component={EditUser} />
                 <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
                 <Stack.Screen name="ChangePasswordAdmin" component={ChangePasswordAdmin} />
+                <Stack.Screen name="BookDetail" component={BookDetail} />
 
             </Stack.Navigator>
         </NavigationContainer>

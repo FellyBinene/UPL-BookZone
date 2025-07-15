@@ -106,4 +106,18 @@ router.put('/password/:matricule', async (req, res) => {
     );
 });
 
+// ✅ Route GET - Liste de tous les administrateurs
+router.get('/', (req, res) => {
+    const query = 'SELECT * FROM admins';
+
+    connection.query(query, (err, results) => {
+        if (err) {
+            console.error("Erreur lors de la récupération des administrateurs :", err);
+            return res.status(500).json({ message: "Erreur serveur" });
+        }
+
+        res.json(results);
+    });
+});
+
 module.exports = router;

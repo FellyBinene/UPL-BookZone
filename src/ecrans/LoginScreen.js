@@ -56,7 +56,7 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.title}>Bienvenue à UPL-BookZone</Text>
 
             <View style={styles.inputContainer}>
-                <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
+                <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
                     keyboardType="default"

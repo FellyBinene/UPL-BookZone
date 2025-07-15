@@ -41,11 +41,15 @@ const UserRow = ({ user, index, onEdit, onDelete }) => (
         <Text style={styles.cell}>{user.id}</Text>
         <Text style={styles.cell}>{user.email}</Text>
         <Text style={styles.cell}>{user.fullName}</Text>
-        <Text style={styles.cell}>{user.birthDate}</Text>
+        <Text style={styles.cell}>
+            {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : 'N/A'}
+        </Text>
         <Text style={styles.cell}>{user.phone}</Text>
         <Text style={styles.cell}>{user.matricule}</Text>
         <Text style={styles.cell}>{user.password}</Text>
-        <Text style={styles.cell}>{user.created_at}</Text>
+        <Text style={styles.cell}>
+            {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+        </Text>
 
         <View style={[styles.cell, styles.actionsCell]}>
             <TouchableOpacity onPress={() => onEdit(user)} style={styles.actionBtn}>
@@ -72,6 +76,7 @@ const ListUsers = () => {
             const res = await fetch('http://192.168.17.89:4000/api/recup-users');
             if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
             const data = await res.json();
+            console.log('Données utilisateurs reçues :', data);  // Ajoute ça
             setUsers(data);
             setError(null);
         } catch (err) {
@@ -137,7 +142,7 @@ const ListUsers = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Liste des utilisateurs</Text>
+            <Text style={styles.title}>Liste Users</Text>
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             <View style={styles.searchBar}>

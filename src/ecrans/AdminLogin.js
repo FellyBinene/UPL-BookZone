@@ -58,7 +58,7 @@ const AdminLogin = ({ navigation }) => {
             <Text style={styles.title}>Administrateurs</Text>
 
             <View style={styles.inputContainer}>
-                <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
+                <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
                 <TextInput
                     style={styles.input}
                     keyboardType="default"

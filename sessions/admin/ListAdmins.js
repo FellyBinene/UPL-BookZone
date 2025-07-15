@@ -131,7 +131,7 @@ const ListAdmins = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Liste des administrateurs</Text>
+            <Text style={styles.title}>Liste Admins</Text>
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* 🔍 Barre de recherche */}
