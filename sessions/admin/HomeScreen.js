@@ -3,14 +3,13 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
     Image,
     ScrollView,
     Dimensions,
-    Platform,
-    StatusBar,
     TouchableOpacity,
+    RefreshControl
 } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';  // <-- importer d'ici
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
@@ -49,6 +48,8 @@ const UsersChoice = ({ onSelect }) => (
 const HomeScreen = ({ route }) => {
     const navigation = useNavigation();
     const { user: admin } = route.params || {};
+
+    const [refreshing, setRefreshing] = useState(false);
     const [activeScreen, setActiveScreen] = useState('Home');
     const [bookCount, setBookCount] = useState(0);
     const [userCount, setUserCount] = useState(0);
@@ -60,9 +61,9 @@ const HomeScreen = ({ route }) => {
 
     const fetchData = async () => {
         try {
-            const booksRes = await fetch('http://192.168.17.89:4000/api/books');
-            const usersRes = await fetch('http://192.168.17.89:4000/api/users');
-            const adminsRes = await fetch('http://192.168.17.89:4000/api/admins');
+            const booksRes = await fetch('http://192.168.136.89:4000/api/books');
+            const usersRes = await fetch('http://192.168.136.89:4000/api/users');
+            const adminsRes = await fetch('http://192.168.136.89:4000/api/admins');
 
             if (!booksRes.ok) throw new Error('Requête échouée: /api/books');
             if (!usersRes.ok) throw new Error('Requête échouée: /api/users');
@@ -85,9 +86,9 @@ const HomeScreen = ({ route }) => {
             case 'AdminProfile':
                 return <AdminProfile admin={admin} />;
             case 'ListUsers':
-                return <ListUsers />;
+                return <ListUsers goToUsersChoice={() => setActiveScreen('UsersChoice')} />;
             case 'ListAdmins':
-                return <ListAdmins />;
+                return <ListAdmins goToUsersChoice={() => setActiveScreen('UsersChoice')} />;
             case 'ListBooks':
                 return <ListBooks />;
             case 'UsersChoice':
@@ -95,7 +96,12 @@ const HomeScreen = ({ route }) => {
             case 'Home':
             default:
                 return (
-                    <ScrollView contentContainerStyle={styles.content}>
+                    <ScrollView
+                        contentContainerStyle={styles.content}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                        }
+                    >
                         <View style={styles.card}>
                             <Text style={styles.label}>Livres</Text>
                             <Text style={styles.value}>{bookCount}</Text>
@@ -126,22 +132,30 @@ const HomeScreen = ({ route }) => {
         }
     };
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await fetchData(); // recharge les données
+        setRefreshing(false);
+    };
+
     return (
-        <SafeAreaView style={styles.safeContainer}>
-            <View style={styles.container}>
-                <Header
-                    onNavigate={handleNavigate}
-                    onChangePassword={() =>
-                        navigation.navigate('ChangePasswordAdmin', {
-                            matricule: admin?.matricule,
-                        })
-                    }
-                    onLogout={() => navigation.replace('ConAdmin')}
-                />
-                <View style={styles.innerContent}>{renderContent()}</View>
-                <Footer onNavigate={handleNavigate} activeScreen={activeScreen} />
-            </View>
-        </SafeAreaView>
+        <SafeAreaProvider>
+            <SafeAreaView style={styles.safeContainer} edges={['top']}>
+                <View style={styles.container}>
+                    <Header
+                        onNavigate={handleNavigate}
+                        onChangePassword={() =>
+                            navigation.navigate('ChangePasswordAdmin', {
+                                matricule: admin?.matricule,
+                            })
+                        }
+                        onLogout={() => navigation.replace('ConAdmin')}
+                    />
+                    <View style={styles.innerContent}>{renderContent()}</View>
+                    <Footer onNavigate={handleNavigate} activeScreen={activeScreen} />
+                </View>
+            </SafeAreaView>
+        </SafeAreaProvider>
     );
 };
 
@@ -149,7 +163,6 @@ const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
         backgroundColor: '#f9fafb',
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     },
     container: {
         flex: 1,

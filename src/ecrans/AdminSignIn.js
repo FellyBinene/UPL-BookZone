@@ -4,14 +4,13 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    Platform,
     Alert
 } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState } from 'react';
 import EvilIcons from "react-native-vector-icons/EvilIcons";
 import Entypo from 'react-native-vector-icons/Entypo';
-import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 
 const AdminSignIn = ({ navigation }) => {
@@ -30,7 +29,7 @@ const AdminSignIn = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://192.168.17.89:4000/api/admins', {
+                const response = await axios.post('http://192.168.136.89:4000/api/admins', {
                     email,
                     fullName,
                     phone,
@@ -57,8 +56,17 @@ const AdminSignIn = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.root}>
-            <View style={styles.inputContainer}>
-                <Entypo name={"add-user"} size={26} color="#000"  style={{ marginRight: 5 }}/>
+
+            {/* Bouton Retour seul en haut */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <MaterialIcons name="arrow-back" size={26} color="#2563eb" />
+                </TouchableOpacity>
+            </View>
+
+            {/* Titre avec icône dans le formulaire */}
+            <View style={styles.formTitleContainer}>
+                <Entypo name="add-user" size={26} color="#000" style={{ marginRight: 8 }} />
                 <Text style={styles.title}>Ajout Admin</Text>
             </View>
 
@@ -140,18 +148,33 @@ export default AdminSignIn;
 const styles = StyleSheet.create({
     root: {
         flex: 1,
-        justifyContent: 'center',
         paddingHorizontal: 25,
         backgroundColor: 'white',
     },
+    header: {
+        paddingTop: 10,
+        paddingBottom: 5,
+    },
+    backBtn: {
+        padding: 6,
+        backgroundColor: '#e0e7ff',
+        borderRadius: 8,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+    },
+    formTitleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 25,
+        marginTop: 10,
+    },
     title: {
-        fontSize: 25,
-        fontWeight: '500',
-        color: '#333',
-        marginTop: 20,
-        marginBottom: 10,
-
-
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1f2937',
     },
     inputContainer: {
         flexDirection: 'row',
@@ -159,24 +182,14 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
         paddingHorizontal: 8,
-        marginBottom: 25
+        marginBottom: 25,
     },
     input: {
         flex: 1,
-    },
-    touchableButton1: {
-        marginBottom: 30,
-        borderRadius: 20,
-        padding: 20,
-        backgroundColor: '#0065ff',
-    },
-    touchableText: {
-        textAlign: 'center',
-        fontWeight: '700',
         fontSize: 16,
-        color: '#fff',
     },
     touchableButton2: {
+        marginTop: 20,
         marginBottom: 30,
         borderRadius: 20,
         padding: 20,
@@ -186,5 +199,5 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '700',
         fontSize: 16,
-    }
+    },
 });

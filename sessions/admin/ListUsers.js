@@ -10,6 +10,7 @@ import {
     TextInput,
     TouchableOpacity,
     Alert,
+    RefreshControl
 } from 'react-native';
 import { Entypo, Feather, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -62,8 +63,9 @@ const UserRow = ({ user, index, onEdit, onDelete }) => (
     </View>
 );
 
-const ListUsers = () => {
+const ListUsers = ({ goToUsersChoice }) => {
     const navigation = useNavigation();
+    const [refreshing, setRefreshing] = useState(false);
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -73,7 +75,7 @@ const ListUsers = () => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const res = await fetch('http://192.168.17.89:4000/api/recup-users');
+            const res = await fetch('http://192.168.136.89:4000/api/recup-users');
             if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
             const data = await res.json();
             console.log('Données utilisateurs reçues :', data);  // Ajoute ça
@@ -94,6 +96,12 @@ const ListUsers = () => {
         }, [])
     );
 
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchUsers(); // recharge les données
+        setTimeout(() => setRefreshing(false), 1000); // effet visuel agréable
+    };
+
     const filteredUsers = users.filter(
         (u) =>
             u.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -112,7 +120,7 @@ const ListUsers = () => {
                 {
                     text: "Supprimer", style: "destructive", onPress: async () => {
                         try {
-                            const res = await fetch(`http://192.168.17.89:4000/api/users/${id}`, {
+                            const res = await fetch(`http://192.168.136.89:4000/api/users/${id}`, {
                                 method: 'DELETE',
                             });
 
@@ -141,10 +149,27 @@ const ListUsers = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Liste Users</Text>
+        <SafeAreaView style={styles.container} >
+            {/* HEADER avec bouton retour personnalisé */}
+            <View style={styles.headerContainer}>
+                <TouchableOpacity
+                    onPress={() => {
+                        if (goToUsersChoice) {
+                            goToUsersChoice();
+                        } else {
+                            navigation.navigate('UsersChoice'); // fallback si pas de prop
+                        }
+                    }}
+                    style={styles.backBtn}
+                >
+                    <MaterialIcons name="arrow-back" size={28} color="#2563eb" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Liste Users</Text>
+            </View>
+
             {error && <Text style={styles.errorText}>{error}</Text>}
 
+            {/* Barre de recherche, bouton ajouter, tableau, etc... */}
             <View style={styles.searchBar}>
                 <Entypo name="magnifying-glass" size={20} color="#000" style={styles.icon} />
                 <TextInput
@@ -163,7 +188,9 @@ const ListUsers = () => {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView horizontal style={styles.tableWrapper} contentContainerStyle={{ paddingVertical: 8 }}>
+            <ScrollView horizontal style={styles.tableWrapper} contentContainerStyle={{ paddingVertical: 8 }} refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
                 <View>
                     <TableHeader />
                     {filteredUsers.length === 0 ? (
@@ -195,12 +222,34 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#e5e7eb',
     },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        paddingHorizontal: 4,
+    },
+    backBtn: {
+        padding: 6,
+        borderRadius: 8,
+        backgroundColor: '#e0e7ff',
+        shadowColor: '#2563eb',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 5,
+        width: 40,        // largeur fixe pour bouton (et espace à droite)
+        height: 40,       // hauteur fixe pour bouton (et espace à droite)
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
     title: {
         fontSize: 26,
         fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
         color: '#1f2937',
+        flex: 1,
+        textAlign: 'center',
+        marginRight: 36,  // pour équilibrer visuellement le backBtn
     },
     searchBar: {
         flexDirection: 'row',

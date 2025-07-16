@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { MaterialIcons } from '@expo/vector-icons'; // <-- Import icon
 
 const EditUser = ({ route, navigation }) => {
     const { user } = route.params;
 
-    // Convertir birthDate string ISO en Date JS
     const initialDate = user.birthDate ? new Date(user.birthDate) : new Date();
 
     const [fullName, setFullName] = useState(user.fullName);
@@ -28,16 +28,14 @@ const EditUser = ({ route, navigation }) => {
 
     const [showDatePicker, setShowDatePicker] = useState(false);
 
-    // Quand la date change dans le picker
     const onChangeDate = (event, selectedDate) => {
-        setShowDatePicker(Platform.OS === 'ios'); // iOS garde visible, Android ferme
+        setShowDatePicker(Platform.OS === 'ios');
         if (selectedDate) {
             setBirthDate(selectedDate);
         }
     };
 
     const formatDate = (date) => {
-        // formate une date JS en 'YYYY-MM-DD'
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
@@ -51,10 +49,10 @@ const EditUser = ({ route, navigation }) => {
         }
 
         try {
-            const response = await axios.put(`http://192.168.17.89:4000/api/users/${user.id}`, {
+            const response = await axios.put(`http://192.168.136.89:4000/api/users/${user.id}`, {
                 fullName,
                 email,
-                birthDate: formatDate(birthDate), // envoie la date formatée en string
+                birthDate: formatDate(birthDate),
                 phone,
                 matricule,
                 password,
@@ -74,7 +72,14 @@ const EditUser = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            {/* Bouton retour */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <MaterialIcons name="arrow-back" size={26} color="#2563eb" />
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 <Text style={styles.title}>Modifier Utilisateur</Text>
 
                 <TextInput
@@ -107,7 +112,7 @@ const EditUser = ({ route, navigation }) => {
                         mode="date"
                         display="default"
                         onChange={onChangeDate}
-                        maximumDate={new Date()} // Empêche de choisir une date future
+                        maximumDate={new Date()}
                     />
                 )}
 
@@ -148,6 +153,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f3f4f6',
         padding: 24,
+    },
+    header: {
+        marginBottom: 10,
+        marginTop: 30
+    },
+    backBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: '#e0e7ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
     },
     title: {
         fontSize: 26,

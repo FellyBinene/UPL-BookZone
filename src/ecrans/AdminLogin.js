@@ -24,7 +24,7 @@ const AdminLogin = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://192.168.17.89:4000/authAdmin/signinAdmin', {
+            const response = await axios.post('http://192.168.136.89:4000/authAdmin/signinAdmin', {
                 matricule: matricule.trim(),
                 password: password.trim(),
             });

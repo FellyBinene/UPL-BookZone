@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 
 const ChangePasswordScreen = ({ route, navigation }) => {
     const { matricule } = route.params;
@@ -13,7 +14,7 @@ const ChangePasswordScreen = ({ route, navigation }) => {
         }
 
         try {
-            const response = await fetch(`http://192.168.17.89:4000/api/users/password/${matricule}`, {
+            const response = await fetch(`http://192.168.136.89:4000/api/users/password/${matricule}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword }),
@@ -29,8 +30,7 @@ const ChangePasswordScreen = ({ route, navigation }) => {
 
             if (!response.ok) throw new Error(data.message || "Erreur lors de la mise à jour");
 
-            // Recharger l'utilisateur à jour
-            const userResponse = await fetch(`http://192.168.17.89:4000/api/users/users/${matricule}`);
+            const userResponse = await fetch(`http://192.168.136.89:4000/api/users/users/${matricule}`);
             const userData = await userResponse.json();
 
             if (!userResponse.ok) throw new Error(userData.message || "Impossible de charger l'utilisateur");
@@ -48,7 +48,13 @@ const ChangePasswordScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Modifier le mot de passe</Text>
+            {/* 🟦 Bouton retour en haut */}
+            <View style={styles.backContainer}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <Entypo name="chevron-left" size={28} color="#2563eb" />
+                </TouchableOpacity>
+                <Text style={styles.title}>Modifier le mot de passe</Text>
+            </View>
 
             <TextInput
                 style={styles.input}
@@ -84,14 +90,20 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#f9fafb',
-        justifyContent: 'center',
+    },
+    backContainer: {
+        marginTop: 25,
+        marginBottom: 30,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    backBtn: {
+        marginRight: 12,
     },
     title: {
         fontSize: 22,
         fontWeight: 'bold',
         color: '#1f2937',
-        textAlign: 'center',
-        marginBottom: 30,
     },
     input: {
         borderWidth: 1,

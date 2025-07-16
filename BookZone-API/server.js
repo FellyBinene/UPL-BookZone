@@ -45,6 +45,10 @@ const Book = sequelize.define('Book', {
     titre: DataTypes.STRING,
     auteur: DataTypes.STRING,
     genre: DataTypes.STRING,
+    date_publication: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
     resume: DataTypes.TEXT,
     fichier_nom: DataTypes.STRING,
     fichier_type: DataTypes.STRING,
@@ -108,7 +112,7 @@ app.post('/api/books/upload', upload.fields([
     { name: 'image', maxCount: 1 }
 ]), async (req, res) => {
     try {
-        const { titre, auteur, genre, resume } = req.body;
+        const { titre, auteur, genre, resume, date_publication } = req.body;
         const fichier = req.files['fichier']?.[0];
         const image = req.files['image']?.[0];
 
@@ -120,6 +124,7 @@ app.post('/api/books/upload', upload.fields([
             titre,
             auteur,
             genre,
+            date_publication,
             resume,
             fichier_nom: fichier.filename,
             fichier_type: fichier.mimetype,
@@ -147,7 +152,7 @@ app.put('/api/books/:id', upload.fields([
 ]), async (req, res) => {
     try {
         const id = req.params.id;
-        const { titre, auteur, genre, resume } = req.body;
+        const { titre, auteur, genre, resume, date_publication } = req.body;
         const fichier = req.files['fichier']?.[0];
         const image = req.files['image']?.[0];
 
@@ -158,6 +163,7 @@ app.put('/api/books/:id', upload.fields([
         book.auteur = auteur || book.auteur;
         book.genre = genre || book.genre;
         book.resume = resume || book.resume;
+        book.date_publication = date_publication || book.date_publication;
 
         if (fichier) {
             book.fichier_nom = fichier.filename;

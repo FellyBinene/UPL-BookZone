@@ -7,7 +7,7 @@ const Accueil = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get('http://192.168.17.89:4000/api/users');
+            const response = await axios.get('http://192.168.136.89:4000/api/users');
             setUsers(response.data);
         } catch (error) {
             Alert.alert('Erreur', 'Impossible de récupérer les utilisateurs');

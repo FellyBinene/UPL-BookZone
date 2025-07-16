@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -5,13 +6,14 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
+    SafeAreaView,
+    ScrollView,
 } from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useState } from 'react';
 import EvilIcons from "react-native-vector-icons/EvilIcons";
 import Entypo from 'react-native-vector-icons/Entypo';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
+import { MaterialIcons } from '@expo/vector-icons'; // ajout icône flèche retour
 
 const AddUsers = ({ navigation }) => {
     const [fullName, setFullName] = useState('');
@@ -54,7 +56,7 @@ const AddUsers = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://192.168.17.89:4000/api/users', {
+                const response = await axios.post('http://192.168.136.89:4000/api/users', {
                     email,
                     fullName,
                     phone,
@@ -82,87 +84,96 @@ const AddUsers = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.root}>
-            <View style={styles.inputContainer}>
-                <Entypo name={"add-user"} size={26} color="#000"  style={{ marginRight:5 }}/>
-                <Text style={styles.title}>Ajout User</Text>
-            </View>
-
-            <View style={styles.inputContainer}>
-                <Entypo name="add-user" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Nom complet"
-                    value={fullName}
-                    onChangeText={setFullName}
-                />
-            </View>
-
-            <View style={styles.inputContainer}>
-                <Entypo name="calendar" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TouchableOpacity onPress={showDatePicker} style={{ flex: 1 }}>
-                    <Text style={{ marginBottom: 5, color: '#555' }}>Date de naissance :</Text>
-                    <Text style={{ color: '#333' }}>{birthDate.toLocaleDateString()}</Text>
+            {/* Bouton retour */}
+            <View style={styles.backContainer}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <MaterialIcons name="arrow-back" size={28} color="#2563eb" />
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.inputContainer}>
-                <Entypo name="phone" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Téléphone"
-                    keyboardType="phone-pad"
-                    value={phone}
-                    onChangeText={setPhone}
-                />
-            </View>
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 30 }}>
+                <View style={styles.inputContainer}>
+                    <Entypo name={"add-user"} size={26} color="#000" style={{ marginRight: 5 }} />
+                    <Text style={styles.title}>Ajout User</Text>
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <Entypo name="add-user" size={20} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Nom complet"
+                        value={fullName}
+                        onChangeText={setFullName}
+                    />
+                </View>
 
-            <View style={styles.inputContainer}>
-                <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Matricule"
-                    keyboardType="numeric"
-                    value={matricule}
-                    onChangeText={setMatricule}
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <Entypo name="calendar" size={20} color="#666" style={{ marginRight: 5 }} />
+                    <TouchableOpacity onPress={showDatePicker} style={{ flex: 1 }}>
+                        <Text style={{ marginBottom: 5, color: '#555' }}>Date de naissance :</Text>
+                        <Text style={{ color: '#333' }}>{birthDate.toLocaleDateString()}</Text>
+                    </TouchableOpacity>
+                </View>
 
-            <View style={styles.inputContainer}>
-                <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Mot de passe"
-                    secureTextEntry
-                    value={password}
-                    onChangeText={setPassword}
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <Entypo name="phone" size={20} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Téléphone"
+                        keyboardType="phone-pad"
+                        value={phone}
+                        onChangeText={setPhone}
+                    />
+                </View>
 
-            <View style={styles.inputContainer}>
-                <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Confirmer mot de passe"
-                    secureTextEntry
-                    value={confirmPassword}
-                    onChangeText={setConfirmPassword}
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <Entypo name="email" size={20} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        keyboardType="email-address"
+                        value={email}
+                        onChangeText={setEmail}
+                    />
+                </View>
 
-            <TouchableOpacity style={styles.touchableButton1} onPress={handleSignUp}>
-                <Text style={styles.touchableText}>Ajouter</Text>
-            </TouchableOpacity>
+                <View style={styles.inputContainer}>
+                    <Entypo name="v-card" size={20} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Matricule"
+                        keyboardType="numeric"
+                        value={matricule}
+                        onChangeText={setMatricule}
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Mot de passe"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={setPassword}
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <EvilIcons name="lock" size={30} color="#666" style={{ marginRight: 5 }} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Confirmer mot de passe"
+                        secureTextEntry
+                        value={confirmPassword}
+                        onChangeText={setConfirmPassword}
+                    />
+                </View>
+
+                <TouchableOpacity style={styles.touchableButton1} onPress={handleSignUp}>
+                    <Text style={styles.touchableText}>Ajouter</Text>
+                </TouchableOpacity>
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -176,12 +187,24 @@ const styles = StyleSheet.create({
         paddingHorizontal: 25,
         backgroundColor: 'white',
     },
+    backContainer: {
+        paddingTop: 12,       // espace au dessus pour ne pas coller au bord haut
+        marginBottom: 12,     // espace en dessous du bouton retour
+    },
+    backBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 10,
+        backgroundColor: '#e0e7ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+    },
     title: {
         fontSize: 26,
         fontWeight: '600',
         color: '#333',
         marginBottom: 20,
-
     },
     inputContainer: {
         flexDirection: 'row',

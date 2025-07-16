@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     Dimensions,
     TextInput,
+    RefreshControl,   // <-- import RefreshControl
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -24,13 +25,12 @@ const DisplayBook = () => {
     const [filteredBooks, setFilteredBooks] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);  // <-- état refreshing
 
-    // Dimensions & responsive cols state
     const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
     const [numColumns, setNumColumns] = useState(2);
     const [cardWidth, setCardWidth] = useState(0);
 
-    // Fonction pour ajuster numColumns et cardWidth selon largeur écran
     const adjustLayout = (width) => {
         let columns = 2;
         if (width >= 900) columns = 4;
@@ -55,7 +55,7 @@ const DisplayBook = () => {
 
     const fetchBooks = async () => {
         try {
-            const response = await axios.get('http://192.168.17.89:4000/api/books');
+            const response = await axios.get('http://192.168.136.89:4000/api/books');
             setBooks(response.data);
             setFilteredBooks(response.data);
         } catch (error) {
@@ -69,20 +69,45 @@ const DisplayBook = () => {
         fetchBooks();
     }, []);
 
+    // Fonction appelée lors du pull-to-refresh
+    const onRefresh = async () => {
+        setRefreshing(true);
+        try {
+            const response = await axios.get('http://192.168.136.89:4000/api/books');
+            setBooks(response.data);
+            // Appliquer le filtre de recherche existant après rafraîchissement
+            if (searchText.trim() === '') {
+                setFilteredBooks(response.data);
+            } else {
+                const filtered = response.data.filter((book) =>
+                    book.titre.toLowerCase().includes(searchText.toLowerCase()) ||
+                    book.auteur.toLowerCase().includes(searchText.toLowerCase()) ||
+                    book.genre.toLowerCase().includes(searchText.toLowerCase()) ||
+                    (book.date_publication && book.date_publication.includes(searchText))
+                );
+                setFilteredBooks(filtered);
+            }
+        } catch (error) {
+            console.error('Erreur rafraîchissement:', error);
+        }
+        setRefreshing(false);
+    };
+
     const handleSearch = (text) => {
         setSearchText(text);
         const filtered = books.filter((book) =>
             book.titre.toLowerCase().includes(text.toLowerCase()) ||
             book.auteur.toLowerCase().includes(text.toLowerCase()) ||
-            book.genre.toLowerCase().includes(text.toLowerCase())
+            book.genre.toLowerCase().includes(text.toLowerCase()) ||
+            (book.date_publication && book.date_publication.includes(text))
         );
         setFilteredBooks(filtered);
     };
 
     const renderItem = ({ item, index }) => {
         const isImage = item.fichier_type?.startsWith('image');
-        const fileUrl = `http://192.168.17.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
-        const imageUrl = `http://192.168.17.89:4000/uploads/images/${item.image_nom}`;
+        const fileUrl = `http://192.168.136.89:4000/uploads/${isImage ? 'images' : 'files'}/${item.fichier_nom}`;
+        const imageUrl = `http://192.168.136.89:4000/uploads/images/${item.image_nom}`;
 
         return (
             <Animatable.View
@@ -90,7 +115,7 @@ const DisplayBook = () => {
                 delay={index * 100}
                 duration={500}
                 useNativeDriver
-                style={[styles.cardWrapper, { width: cardWidth }]}  // width dynamique ici
+                style={[styles.cardWrapper, { width: cardWidth }]}
             >
                 <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { book: item })} activeOpacity={0.9} style={styles.card}>
                     <Image source={{ uri: imageUrl }} style={styles.cover} />
@@ -125,10 +150,13 @@ const DisplayBook = () => {
                 data={filteredBooks}
                 keyExtractor={item => item.id.toString()}
                 renderItem={renderItem}
-                style={{ flex: 1 }}  // <-- important
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.container}
                 numColumns={numColumns}
                 columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: spacing }}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
             />
         </View>
     );
@@ -150,7 +178,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     cardWrapper: {
-        minHeight: 260, // hauteur fixe pour uniformité
+        minHeight: 260,
     },
     card: {
         backgroundColor: '#ffffff',

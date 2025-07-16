@@ -25,7 +25,7 @@ const LoginScreen = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://192.168.17.89:4000/auth/signin', {
+            const response = await axios.post('http://192.168.136.89:4000/auth/signin', {
                 matricule: matricule.trim(),
                 password: password.trim(),
             });

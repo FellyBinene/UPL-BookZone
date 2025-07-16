@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -9,28 +9,56 @@ import {
     Dimensions,
     ScrollView,
     SafeAreaView,
+    RefreshControl,  // <-- import RefreshControl
 } from 'react-native';
+import { Entypo } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
 
-const BookDetail = ({ route }) => {
+const BookDetail = ({ route, navigation }) => {
     const { book } = route.params;
 
+    const [refreshing, setRefreshing] = useState(false);
+
     const isImage = book.fichier_type?.startsWith('image');
-    const fileUrl = `http://192.168.17.89:4000/uploads/${isImage ? 'images' : 'files'}/${book.fichier_nom}`;
-    const imageUrl = `http://192.168.17.89:4000/uploads/images/${book.image_nom}`;
+    const fileUrl = `http://192.168.136.89:4000/uploads/${isImage ? 'images' : 'files'}/${book.fichier_nom}`;
+    const imageUrl = `http://192.168.136.89:4000/uploads/images/${book.image_nom}`;
+
+    // Fonction de refresh, ici on simule juste un délai (à adapter si fetch réel)
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        // Simule un délai pour refresh, ou refetch les données du livre si API
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1500);
+    }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+                <View style={styles.imageWrapper}>
+                    <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
+
+                    <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
+                        <Entypo name="chevron-left" size={32} color="#fff" />
+                    </TouchableOpacity>
+                </View>
 
                 <Text style={styles.title}>{book.titre}</Text>
 
                 <Text style={styles.info}><Text style={styles.label}>Auteur :</Text> {book.auteur || 'Non spécifié'}</Text>
                 <Text style={styles.info}><Text style={styles.label}>Genre :</Text> {book.genre || 'Non spécifié'}</Text>
-                <Text style={styles.info}><Text style={styles.label}>ISBN :</Text> {book.isbn || 'Non spécifié'}</Text>
-                <Text style={styles.info}><Text style={styles.label}>Date de publication :</Text> {book.date_publication || 'Non spécifiée'}</Text>
+                <Text style={styles.info}>
+                    <Text style={styles.label}>Date de publication :</Text>{' '}
+                    {book.date_publication
+                        ? new Date(book.date_publication).toLocaleDateString()
+                        : 'Non spécifiée'}
+                </Text>
                 <Text style={styles.info}><Text style={styles.label}>Résumé :</Text> {book.resume || 'Aucun résumé fourni.'}</Text>
             </ScrollView>
 
@@ -52,14 +80,29 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         padding: 20,
-        paddingBottom: 100, // Pour laisser de l’espace au bouton en bas
+        paddingBottom: 100,
         alignItems: 'center',
     },
-    image: {
+    imageWrapper: {
+        position: 'relative',
         width: width * 0.95,
-        height: height * 0.4, // occupe 40% de l'écran
-        borderRadius: 12,
+        height: height * 0.4,
         marginBottom: 24,
+    },
+    image: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 12,
+    },
+    backBtn: {
+        position: 'absolute',
+        top: 12,
+        left: 12,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
+        padding: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     title: {
         fontSize: 24,

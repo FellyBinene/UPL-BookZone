@@ -14,6 +14,7 @@
         <input type="text" id="titre" placeholder="Titre" class="w-full border px-4 py-2 rounded" required />
         <input type="text" id="auteur" placeholder="Auteur" class="w-full border px-4 py-2 rounded" required />
         <input type="text" id="genre" placeholder="Genre" class="w-full border px-4 py-2 rounded" required />
+        <input type="date" id="date_publication" class="w-full border px-4 py-2 rounded" required />
         <textarea id="resume" placeholder="Résumé" class="w-full border px-4 py-2 rounded" rows="4" required></textarea>
 
         <label class="block font-semibold text-gray-700">Image de couverture :</label>
@@ -39,11 +40,12 @@
         const titre = document.getElementById('titre').value.trim();
         const auteur = document.getElementById('auteur').value.trim();
         const genre = document.getElementById('genre').value.trim();
+        const date_publication = document.getElementById('date_publication').value;
         const resume = document.getElementById('resume').value.trim();
         const fichier = document.getElementById('fichier').files[0];
         const image = document.getElementById('image_couverture').files[0];
 
-        if (!titre || !auteur || !genre || !resume || !fichier || !image) {
+        if (!titre || !auteur || !genre || !date_publication || !resume || !fichier || !image) {
             message.textContent = "Veuillez remplir tous les champs et ajouter les deux fichiers.";
             message.className = "text-red-600";
             return;
@@ -53,6 +55,7 @@
         formData.append('titre', titre);
         formData.append('auteur', auteur);
         formData.append('genre', genre);
+        formData.append('date_publication', date_publication);
         formData.append('resume', resume);
         formData.append('fichier', fichier); // fichier PDF ou autre
         formData.append('image', image);     // image de couverture

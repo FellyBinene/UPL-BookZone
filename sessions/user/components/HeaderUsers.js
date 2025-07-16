@@ -10,7 +10,7 @@ const HeaderUsers = ({ onRightPress }) => {
 
     const checkNotifications = useCallback(async () => {
         try {
-            const res = await axios.get('http://192.168.17.89:4000/api/notifications');
+            const res = await axios.get('http://192.168.136.89:4000/api/notifications');
             setHasNotification(res.data.notifications && res.data.notifications.length > 0);
         } catch (err) {
             console.error('Erreur notification :', err);

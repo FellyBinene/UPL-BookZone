@@ -3,9 +3,9 @@ import {
     Dimensions,
     View,
     Text,
-    StyleSheet,
-    SafeAreaView, Image,
+    StyleSheet, Image, RefreshControl, ScrollView
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';  // Recommande d'utiliser react-native-safe-area-context
 import { MaterialIcons } from '@expo/vector-icons'; // si tu préfères une icône vectorielle
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +19,7 @@ const { height, width } = Dimensions.get("window");
 const HomeScreenUsers = ({ route }) => {
     const navigation = useNavigation();
     const userFromLogin = route?.params?.user || null; // extraire l'utilisateur de route params
+    const [refreshing, setRefreshing] = useState(false);
 
     const [activeScreen, setActiveScreen] = useState('HomeUsers');
     const [user, setUser] = useState(userFromLogin);
@@ -30,11 +31,25 @@ const HomeScreenUsers = ({ route }) => {
         navigation.replace('Connexion');
     };
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        try {
+            const res = await fetch('http://192.168.136.89:4000/api/books');
+            if (!res.ok) throw new Error('Erreur lors du chargement des livres');
+            const books = await res.json();
+            setBookCount(books.length);
+        } catch (error) {
+            console.error('Erreur fetch books:', error.message);
+        }
+        setRefreshing(false);
+    };
+
+
     useEffect(() => {
         // Charge le nombre de livres publiés
         const fetchBookCount = async () => {
             try {
-                const res = await fetch('http://192.168.17.89:4000/api/books');
+                const res = await fetch('http://192.168.136.89:4000/api/books');
                 if (!res.ok) throw new Error('Erreur lors du chargement des livres');
                 const books = await res.json();
                 setBookCount(books.length);
@@ -60,7 +75,10 @@ const HomeScreenUsers = ({ route }) => {
                 );
             default:
                 return (
-                    <View style={styles.homeContent}>
+                    <ScrollView
+                        contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16 }}
+                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+                    >
                         <Image
                             source={require('../../assets/images/svg/Livre.png')}
                             style={styles.headerImage}
@@ -68,18 +86,15 @@ const HomeScreenUsers = ({ route }) => {
                         />
                         <Text style={styles.title}>Bienvenue à UPL-BookZone</Text>
 
-                        {/* Bloc "Livres publiés" avec style admin */}
                         <View style={styles.card}>
                             <Text style={styles.label}>Livres publiés</Text>
                             <Text style={styles.value}>{bookCount}</Text>
-                            {/* Icône similaire à HomeScreen (tu peux changer l'icône ou l'image) */}
                             <Image
                                 source={require('../../assets/images/svg/Livres.png')}
                                 style={styles.icon}
                             />
-
                         </View>
-                    </View>
+                    </ScrollView>
                 );
         }
     };
@@ -106,6 +121,10 @@ const HomeScreenUsers = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#f3f4f6",
+    },
     container: {
         flex: 1,
         backgroundColor: "#f3f4f6",
@@ -113,7 +132,6 @@ const styles = StyleSheet.create({
         width: width,
         flexDirection: 'column',
         justifyContent: "space-between",
-        paddingTop: 36,
     },
     content: {
         flex: 1,

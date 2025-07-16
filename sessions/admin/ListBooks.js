@@ -13,6 +13,7 @@ import {
     Linking,
     Dimensions,
     StyleSheet,
+    RefreshControl
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { MaterialIcons, Feather, Entypo } from '@expo/vector-icons';
@@ -21,9 +22,22 @@ import useDeleteBook from '../../hooks/useDeleteBook';
 import useEditBook from '../../hooks/useEditBook';
 import useSearchBooks from '../../hooks/useSearchBooks';
 
-const API_URL = 'http://192.168.17.89:4000/api/books';
+const API_URL = 'http://192.168.136.89:4000/api/books';
+const COLUMN_WIDTHS = {
+    index: 40,
+    titre: 140,
+    auteur: 120,
+    genre: 100,
+    resume: 180,
+    date: 120,
+    image: 70,
+    fichier: 80,
+    actions: 110,
+};
 
 const ListBooks = () => {
+    const [refreshing, setRefreshing] = useState(false);
+
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedBook, setSelectedBook] = useState(null);
@@ -51,6 +65,12 @@ const ListBooks = () => {
         }, [])
     );
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await loadBooks();
+        setRefreshing(false);
+    };
+
     const { handleDelete } = useDeleteBook(loadBooks);
     const {
         editFields,
@@ -75,6 +95,7 @@ const ListBooks = () => {
             auteur: book.auteur,
             genre: book.genre,
             resume: book.resume,
+            date_publication: book.date_publication, // 👈 à ajouter
         });
         setImage(null);
         setFile(null);
@@ -85,25 +106,49 @@ const ListBooks = () => {
 
     const renderHeader = () => (
         <View style={styles.headerRow}>
-            {['#', 'Titre', 'Auteur', 'Genre', 'Résumé', 'Image', 'Fichier', 'Actions'].map((title, index) => (
-                <Text key={index} style={styles.headerText}>{title}</Text>
-            ))}
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.index }]}>#</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.titre }]}>Titre</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.auteur }]}>Auteur</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.genre }]}>Genre</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.resume }]}>Résumé</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.date }]}>Date</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.image }]}>Image</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.fichier }]}>Fichier</Text>
+            <Text style={[styles.headerText, { width: COLUMN_WIDTHS.actions }]}>Actions</Text>
         </View>
     );
 
     const renderItem = ({ item, index }) => (
         <View style={[styles.dataRow, { backgroundColor: index % 2 === 0 ? '#eef2ff' : '#fff' }]}>
-            <Text style={styles.cell}>{index + 1}</Text>
-            <Text style={styles.cell}>{item.titre}</Text>
-            <Text style={styles.cell}>{item.auteur}</Text>
-            <Text style={styles.cell}>{item.genre}</Text>
-            <Text style={[styles.cell, { width: 180 }]} numberOfLines={2}>{item.resume}</Text>
-            <Image source={{ uri: `http://192.168.17.89:4000/uploads/images/${item.image_nom}` }} style={styles.image} />
-            <TouchableOpacity
-                onPress={() => Linking.openURL(`http://192.168.17.89:4000/uploads/${item.fichier_type.startsWith('image') ? 'images' : 'files'}/${item.fichier_nom}`)}>
-                <Text style={styles.link}>Ouvrir</Text>
-            </TouchableOpacity>
-            <View style={styles.actions}>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.index }]}>{index + 1}</Text>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.titre }]}>{item.titre}</Text>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.auteur }]}>{item.auteur}</Text>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.genre }]}>{item.genre}</Text>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.resume }]} numberOfLines={2}>{item.resume}</Text>
+            <Text style={[styles.cell, { width: COLUMN_WIDTHS.date }]}>
+                {item.date_publication
+                    ? new Date(item.date_publication).toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                    })
+                    : 'N/A'}
+            </Text>
+            <View style={{ width: COLUMN_WIDTHS.image, justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                    source={{ uri: `http://192.168.136.89:4000/uploads/images/${item.image_nom}` }}
+                    style={styles.image}
+                    resizeMode="cover"
+                />
+            </View>
+            <View style={{ width: COLUMN_WIDTHS.fichier, justifyContent: 'center', alignItems: 'center' }}>
+                <TouchableOpacity
+                    onPress={() => Linking.openURL(`http://192.168.136.89:4000/uploads/${item.fichier_type.startsWith('image') ? 'images' : 'files'}/${item.fichier_nom}`)}
+                >
+                    <Text style={styles.link}>Ouvrir</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={[styles.actions, { width: COLUMN_WIDTHS.actions }]}>
                 <TouchableOpacity onPress={() => handleEdit(item)} style={styles.editBtn}>
                     <Feather name="edit" size={20} color="black" />
                 </TouchableOpacity>
@@ -147,17 +192,29 @@ const ListBooks = () => {
             {filteredBooks.length === 0 ? (
                 <Text style={styles.empty}>Aucun livre disponible.</Text>
             ) : (
-                <ScrollView horizontal showsHorizontalScrollIndicator={true} contentContainerStyle={{ paddingHorizontal: 16 }}>
-                    <View style={{ minWidth: Math.max(screenWidth * 1.8, 900) }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={true} refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
+                    <View style={{ minWidth: Object.values(COLUMN_WIDTHS).reduce((a, b) => a + b, 0) }}>
                         {renderHeader()}
-                        <FlatList data={filteredBooks} keyExtractor={(item) => item.id.toString()} renderItem={renderItem} />
+                        <FlatList
+                            data={filteredBooks}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={renderItem}
+                        />
                     </View>
                 </ScrollView>
             )}
 
             <Modal visible={modalVisible} animationType="slide">
                 <ScrollView style={styles.modalWrapper} contentContainerStyle={{ paddingBottom: 40 }}>
-                    <Text style={styles.modalTitle}>Modifier le livre</Text>
+                    {/* AJOUT BOUTON RETOUR ICI */}
+                    <View style={styles.backContainer}>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.backBtn}>
+                            <MaterialIcons name="arrow-back" size={28} color="#2563eb" />
+                        </TouchableOpacity>
+                        <Text style={styles.modalTitle}>Modifier le livre</Text>
+                    </View>
 
                     <View style={styles.formGroup}>
                         <Text style={styles.label}>Titre</Text>
@@ -201,6 +258,16 @@ const ListBooks = () => {
                     </View>
 
                     <View style={styles.formGroup}>
+                        <Text style={styles.label}>Date de publication</Text>
+                        <TextInput
+                            placeholder="AAAA-MM-JJ"
+                            value={editFields.date_publication}
+                            onChangeText={(text) => setEditFields({ ...editFields, date_publication: text })}
+                            style={styles.modalInput}
+                        />
+                    </View>
+
+                    <View style={styles.formGroup}>
                         <Button title="Choisir une nouvelle image" onPress={pickImage} color="#4f46e5" />
                     </View>
 
@@ -229,6 +296,26 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#e5e7eb', // gris clair moderne
         paddingVertical: 10,
+    },
+    backContainer: {
+        marginBottom: 20,
+        justifyContent: "space-between",
+        alignItems: "center",
+        // Optionnel pour ombre
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    backBtn: {
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: '#e0e7ff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
     },
     title: {
         fontSize: 26,
@@ -282,10 +369,10 @@ const styles = StyleSheet.create({
         elevation: 4,
     },
     headerText: {
-        width: 120,
         fontWeight: 'bold',
-        color: '#1e3a8a', // bleu profond
+        color: '#1e3a8a',
         fontSize: 14,
+        paddingHorizontal: 6,
     },
     dataRow: {
         flexDirection: 'row',
@@ -302,27 +389,25 @@ const styles = StyleSheet.create({
         elevation: 2,
     },
     cell: {
-        width: 120,
         fontSize: 13.5,
         color: '#374151',
+        paddingHorizontal: 6,
+        overflow: 'hidden',
     },
     image: {
         width: 50,
         height: 50,
         borderRadius: 6,
-        marginRight: 10,
     },
     link: {
         color: '#2563eb',
         textDecorationLine: 'underline',
-        width: 80,
         fontSize: 13,
     },
     actions: {
         flexDirection: 'column',
         alignItems: 'center',
         marginLeft: 10,
-        width: 110,
         gap: 6,
     },
     editBtn: {
@@ -340,7 +425,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalTitle: {
-        fontSize: 18,
+        fontSize: 30,
         fontWeight: 'bold',
         marginBottom: 10,
         color: '#111827',

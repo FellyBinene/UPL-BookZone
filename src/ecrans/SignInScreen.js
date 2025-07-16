@@ -54,7 +54,7 @@ const SignInScreen = ({ navigation }) => {
             }
 
             try {
-                const response = await axios.post('http://192.168.17.89:4000/api/users', {
+                const response = await axios.post('http://192.168.136.89:4000/api/users', {
                     email,
                     fullName,
                     birthDate: birthDate.toISOString().split('T')[0],

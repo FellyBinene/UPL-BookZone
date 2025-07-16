@@ -11,6 +11,7 @@ import {
     Platform,
     ScrollView,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const ChangePasswordAdmin = ({ route, navigation }) => {
     const { matricule } = route.params;
@@ -28,7 +29,7 @@ const ChangePasswordAdmin = ({ route, navigation }) => {
         }
 
         try {
-            const response = await fetch(`http://192.168.17.89:4000/api/admins/password/${matricule}`, {
+            const response = await fetch(`http://192.168.136.89:4000/api/admins/password/${matricule}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ currentPassword, newPassword }),
@@ -48,7 +49,7 @@ const ChangePasswordAdmin = ({ route, navigation }) => {
             }
 
             Alert.alert("Succès", "Mot de passe modifié avec succès.");
-            navigation.replace('Home', { user: { matricule } }); // Redirige vers Home avec l'admin
+            navigation.replace('Home', { user: { matricule } });
         } catch (error) {
             Alert.alert("Erreur", error.message);
         }
@@ -56,10 +57,16 @@ const ChangePasswordAdmin = ({ route, navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            {/* Bouton retour */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <MaterialIcons name="arrow-back" size={26} color="#2563eb" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Changer le mot de passe</Text>
+            </View>
+
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.inner}>
-                    <Text style={styles.title}>Modifier mot de passe Admin</Text>
-
                     <TextInput
                         placeholder="Mot de passe actuel"
                         style={styles.input}
@@ -96,17 +103,31 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f9fafb',
     },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 16,
+        backgroundColor: '#e0e7ff',
+        borderBottomWidth: 1,
+        borderColor: '#c7d2fe',
+        marginTop : 30
+    },
+    backBtn: {
+        marginRight: 12,
+        padding: 6,
+        backgroundColor: '#ffffff',
+        borderRadius: 8,
+        elevation: 3,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#1f2937',
+    },
     inner: {
         padding: 20,
         justifyContent: 'center',
         flexGrow: 1,
-    },
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#1f2937',
-        textAlign: 'center',
-        marginBottom: 30,
     },
     input: {
         backgroundColor: '#fff',

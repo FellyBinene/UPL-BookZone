@@ -4,10 +4,16 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.17.89:4000/api/books';
+const API_URL = 'http://192.168.136.89:4000/api/books';
 
 export default function useEditBook(selectedBook, loadBooks, closeModal) {
-    const [editFields, setEditFields] = useState({ titre: '', auteur: '', genre: '', resume: '' });
+    const [editFields, setEditFields] = useState({
+        titre: '',
+        auteur: '',
+        genre: '',
+        resume: '',
+        date_publication: ''
+    });
     const [image, setImage] = useState(null);
     const [file, setFile] = useState(null);
     const [message, setMessage] = useState('');
@@ -24,17 +30,39 @@ export default function useEditBook(selectedBook, loadBooks, closeModal) {
 
     const submitEdit = async () => {
         const formData = new FormData();
-        formData.append('titre', editFields.titre);
-        formData.append('auteur', editFields.auteur);
-        formData.append('genre', editFields.genre);
-        formData.append('resume', editFields.resume);
-        if (image) formData.append('image', { uri: image.uri, name: 'cover.jpg', type: 'image/jpeg' });
-        if (file) formData.append('fichier', { uri: file.uri, name: file.name, type: file.mimeType });
+
+        formData.append('titre', editFields.titre.trim());
+        formData.append('auteur', editFields.auteur.trim());
+        formData.append('genre', editFields.genre.trim());
+        formData.append('resume', editFields.resume.trim());
+
+        const formattedDate = editFields.date_publication
+            ? new Date(editFields.date_publication).toISOString().split('T')[0]
+            : '';
+        formData.append('date_publication', formattedDate);
+
+        if (image) {
+            formData.append('image', {
+                uri: image.uri,
+                name: 'cover.jpg',
+                type: 'image/jpeg',
+            });
+        }
+
+        if (file) {
+            const type = file.mimeType || (file.name.endsWith('.pdf') ? 'application/pdf' : 'application/octet-stream');
+            formData.append('fichier', {
+                uri: file.uri,
+                name: file.name,
+                type,
+            });
+        }
 
         try {
             const res = await axios.put(`${API_URL}/${selectedBook.id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
+
             if (res.data.success) {
                 setMessage('✅ Modifié.');
                 loadBooks();

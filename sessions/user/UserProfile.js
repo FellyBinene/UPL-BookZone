@@ -22,7 +22,10 @@ const UserProfile = ({ user, onLogout, onChangePassword }) => {
                 <Text style={styles.info}><Text style={styles.label}>Nom :</Text> {user.fullName}</Text>
                 <Text style={styles.info}><Text style={styles.label}>Email :</Text> {user.email}</Text>
                 <Text style={styles.info}><Text style={styles.label}>Téléphone :</Text> {user.phone}</Text>
-                <Text style={styles.info}><Text style={styles.label}>Date de naissance :</Text> {user.birthDate}</Text>
+                <Text style={styles.info}>
+                    <Text style={styles.label}>Date de naissance :</Text>{' '}
+                    {user.birthDate ? new Date(user.birthDate).toLocaleDateString('fr-FR') : 'Non spécifiée'}
+                </Text>
                 <Text style={styles.info}><Text style={styles.label}>Matricule :</Text> {user.matricule}</Text>
             </View>
 
@@ -47,6 +50,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f3f4f6',
         padding: 20,
         alignItems: 'center',
+        width: "100%"
     },
     header: {
         alignItems: 'center',
@@ -85,7 +89,7 @@ const styles = StyleSheet.create({
     },
     buttonGroup: {
         marginTop: 30,
-        width: '100%',
+        width: '60%',
         gap: 12,
     },
     btn: {

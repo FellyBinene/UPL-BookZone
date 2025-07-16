@@ -9,6 +9,7 @@ import {
     ScrollView,
     TextInput,
     TouchableOpacity,
+    RefreshControl,
     Alert,
 } from 'react-native';
 import { Entypo, Feather, MaterialIcons } from '@expo/vector-icons';
@@ -47,8 +48,9 @@ const AdminRow = ({ user, index, onEdit, onDelete }) => (
     </View>
 );
 
-const ListAdmins = () => {
+const ListAdmins = ({ goToUsersChoice }) => {
     const navigation = useNavigation();
+    const [refreshing, setRefreshing] = useState(false);
 
     const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ const ListAdmins = () => {
 
     const loadAdmins = () => {
         setLoading(true);
-        fetch('http://192.168.17.89:4000/api/recup-admins')
+        fetch('http://192.168.136.89:4000/api/recup-admins')
             .then((res) => {
                 if (!res.ok) throw new Error(`Erreur HTTP : ${res.status}`);
                 return res.json();
@@ -78,6 +80,14 @@ const ListAdmins = () => {
             loadAdmins(); // recharge quand on revient sur l'écran
         }, [])
     );
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        loadAdmins(); // recharge les données
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 1000); // facultatif, pour effet visuel
+    };
 
     const filteredAdmins = admins.filter((a) =>
         a.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -100,7 +110,7 @@ const ListAdmins = () => {
                     text: 'Supprimer',
                     style: 'destructive',
                     onPress: () => {
-                        fetch(`http://192.168.17.89:4000/api/admins/${id}`, {
+                        fetch(`http://192.168.136.89:4000/api/admins/${id}`, {
                             method: 'DELETE',
                         })
                             .then((res) => {
@@ -130,8 +140,29 @@ const ListAdmins = () => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Liste Admins</Text>
+        <SafeAreaView style={styles.container} >
+            {/* HEADER avec bouton retour */}
+            <View style={styles.headerContainer}>
+                <TouchableOpacity
+                    onPress={() => {
+                        if (goToUsersChoice) {
+                            goToUsersChoice(); // revenir à l’écran UsersChoice depuis HomeScreen
+                        } else if (navigation.canGoBack()) {
+                            navigation.goBack(); // sinon revenir normalement
+                        } else {
+                            navigation.navigate('HomeScreen'); // fallback ultime
+                        }
+                    }}
+                    style={styles.backBtn}
+                >
+                    <MaterialIcons name="arrow-back" size={28} color="#2563eb" />
+                </TouchableOpacity>
+
+                <Text style={styles.title}>Liste Admins</Text>
+
+
+            </View>
+
             {error && <Text style={styles.errorText}>{error}</Text>}
 
             {/* 🔍 Barre de recherche */}
@@ -154,7 +185,9 @@ const ListAdmins = () => {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView horizontal style={styles.tableWrapper} contentContainerStyle={{ paddingVertical: 8 }}>
+            <ScrollView horizontal style={styles.tableWrapper} contentContainerStyle={{ paddingVertical: 8 }} refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
                 <View>
                     <TableHeader />
                     {filteredAdmins.length === 0 ? (
@@ -186,12 +219,36 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#e5e7eb',
     },
+    headerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+
+    backBtn: {
+        padding: 6,
+        borderRadius: 8,
+        backgroundColor: '#e0e7ff',
+        shadowColor: '#2563eb',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 5,
+        width: 40,        // largeur fixe pour bouton (et espace à droite)
+        height: 40,       // hauteur fixe pour bouton (et espace à droite)
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+
     title: {
+        flex: 1,
         fontSize: 26,
         fontWeight: 'bold',
         textAlign: 'center',
-        marginBottom: 20,
         color: '#1f2937',
+        marginBottom: 0,
+        marginRight: '10%'// enlever marginBottom car on est dans header container
     },
     searchBar: {
         flexDirection: 'row',
